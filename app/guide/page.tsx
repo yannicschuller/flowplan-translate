@@ -140,8 +140,8 @@ export default async function Guide() {
             <li>{t("Überall die Sie-Form „vous“, nie „tu“.", "Formal “vous” everywhere, never “tu”.")}</li>
             <li>
               {t(
-                "Französische Typografie: ein geschütztes Leerzeichen (U+00A0) vor : ; ! ? und innerhalb von « ». Ein normales Leerzeichen in bestehenden Texten ist in Ordnung.",
-                "French typography: a non-breaking space (U+00A0) before : ; ! ? and inside « ». A normal space in existing texts is fine.",
+                "Französische Typografie: ein Leerzeichen vor : ; ! ? und innerhalb von « ». Ein normales Leerzeichen genügt, ein geschütztes ist nicht nötig.",
+                "French typography: a space before : ; ! ? and inside « ». A normal space is fine; no non-breaking space needed.",
               )}
               <dl className="guide-example">
                 <Example label="✓" text={"Supprimer « {0} » ?"} lang="fr" />
