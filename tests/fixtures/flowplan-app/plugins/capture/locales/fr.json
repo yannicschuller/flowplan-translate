@@ -1,0 +1,12 @@
+{
+  "heading": "Enregistrer dans Flowplan",
+  "cancel": "Annuler",
+  "save": "",
+  "close": "Fermer",
+  "titleField": "Titre (facultatif)",
+  "textField": "Texte (facultatif)",
+  "saved": "Enregistré dans {target}",
+  "failed": "",
+  "tooMany": "Au maximum {count} fichiers à la fois.",
+  "tooLarge": "{name} dépasse {mb} Mo."
+}

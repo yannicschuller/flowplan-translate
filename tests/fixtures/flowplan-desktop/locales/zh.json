@@ -1,0 +1,10 @@
+{
+  "server.empty": "请输入你的 Flowplan 实例地址。",
+  "server.httpsOnly": "只允许 HTTPS 地址（HTTP 仅限 localhost）。",
+  "server.unreachable": "无法访问该地址（{0}）。请检查拼写和网络连接。",
+  "server.redirects": "",
+  "server.proxyAuth": "服务器要求先登录（HTTP {0}），例如在其前面的代理或 VPN 上。请先在那里登录，或询问你的管理员。",
+  "server.status": "服务器返回错误（HTTP {0}）。Flowplan 目前无法在该地址使用。",
+  "server.notFound": "在 {0} 未找到 Flowplan 实例（{1}）",
+  "server.untrusted": ""
+}

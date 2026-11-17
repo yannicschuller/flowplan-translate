@@ -1,0 +1,12 @@
+{
+  "Add a task": "Add a task",
+  "Adds a task to a list or database in Flowplan.": "Adds a task to a list or database in Flowplan.",
+  "What's the task?": "What's the task?",
+  "Due": "Due",
+  "List": "List",
+  "Added to %@": "Added to %@",
+  "Added to %@, due %@": "Added to %@, due %@",
+  "%d due today": "%d due today",
+  "%d overdue": "%d overdue",
+  "%@: %@": "%@: %@"
+}

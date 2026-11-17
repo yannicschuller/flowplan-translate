@@ -1,0 +1,241 @@
+{
+  "components": [
+    {
+      "id": "flowplan-web",
+      "title": "Flowplan · web app",
+      "repo": "yannicschuller/flowplan",
+      "format": "flat-json",
+      "source": "en",
+      "reference": "de",
+      "targets": [
+        "fr",
+        "zh"
+      ],
+      "files": {
+        "en": "locales/en.json",
+        "de": "locales/reference/de.json",
+        "fr": "locales/fr.json",
+        "zh": "locales/zh.json"
+      },
+      "placeholders": [
+        "index"
+      ]
+    },
+    {
+      "id": "flowplan-app-system",
+      "title": "Flowplan app · system texts",
+      "repo": "yannicschuller/flowplan-app",
+      "format": "nested-json",
+      "source": "en",
+      "reference": "de",
+      "targets": [
+        "fr",
+        "zh"
+      ],
+      "files": {
+        "en": "locales/en.json",
+        "de": "locales/de.json",
+        "fr": "locales/fr.json",
+        "zh": "locales/zh.json"
+      },
+      "placeholders": [
+        "printf",
+        "brace"
+      ]
+    },
+    {
+      "id": "flowplan-app-ui",
+      "title": "Flowplan app · app UI",
+      "repo": "yannicschuller/flowplan-app",
+      "format": "flat-json",
+      "source": "en",
+      "reference": "de",
+      "targets": [
+        "fr",
+        "zh"
+      ],
+      "files": {
+        "en": "locales/ui/en.json",
+        "de": "locales/ui/de.json",
+        "fr": "locales/ui/fr.json",
+        "zh": "locales/ui/zh.json"
+      },
+      "context": "locales/ui/context.json",
+      "placeholders": [
+        "brace",
+        "printf",
+        "dollar"
+      ]
+    },
+    {
+      "id": "flowplan-app-capture",
+      "title": "Flowplan app · share extension",
+      "repo": "yannicschuller/flowplan-app",
+      "format": "flat-json",
+      "source": "en",
+      "reference": "de",
+      "targets": [
+        "fr",
+        "zh"
+      ],
+      "files": {
+        "en": "plugins/capture/locales/en.json",
+        "de": "plugins/capture/locales/de.json",
+        "fr": "plugins/capture/locales/fr.json",
+        "zh": "plugins/capture/locales/zh.json"
+      },
+      "context": "plugins/capture/locales/context.json",
+      "placeholders": [
+        "brace",
+        "printf",
+        "dollar"
+      ]
+    },
+    {
+      "id": "flowplan-app-intents",
+      "title": "Flowplan app · Siri & shortcuts",
+      "repo": "yannicschuller/flowplan-app",
+      "format": "flat-json",
+      "source": "en",
+      "reference": "de",
+      "targets": [
+        "fr",
+        "zh"
+      ],
+      "files": {
+        "en": "plugins/intents/locales/en.json",
+        "de": "plugins/intents/locales/de.json",
+        "fr": "plugins/intents/locales/fr.json",
+        "zh": "plugins/intents/locales/zh.json"
+      },
+      "context": "plugins/intents/locales/context.json",
+      "placeholders": [
+        "brace",
+        "printf",
+        "dollar"
+      ]
+    },
+    {
+      "id": "flowplan-app-widget-suite",
+      "title": "Flowplan app · widgets",
+      "repo": "yannicschuller/flowplan-app",
+      "format": "flat-json",
+      "source": "en",
+      "reference": "de",
+      "targets": [
+        "fr",
+        "zh"
+      ],
+      "files": {
+        "en": "plugins/widget-suite/locales/en.json",
+        "de": "plugins/widget-suite/locales/de.json",
+        "fr": "plugins/widget-suite/locales/fr.json",
+        "zh": "plugins/widget-suite/locales/zh.json"
+      },
+      "context": "plugins/widget-suite/locales/context.json",
+      "placeholders": [
+        "brace",
+        "printf",
+        "dollar"
+      ]
+    },
+    {
+      "id": "flowplan-app-store",
+      "title": "Flowplan app · store listing",
+      "repo": "yannicschuller/flowplan-app",
+      "format": "txt-files",
+      "source": "en",
+      "reference": "de",
+      "targets": [
+        "fr",
+        "zh"
+      ],
+      "files": [
+        {
+          "key": "app-store/{field}",
+          "path": "store/app-store/{locale}/{field}.txt",
+          "locales": {
+            "en": "en-US",
+            "de": "de-DE",
+            "fr": "fr-FR",
+            "zh": "zh-Hans"
+          },
+          "fields": [
+            "name",
+            "subtitle",
+            "keywords",
+            "promotional_text",
+            "description"
+          ]
+        },
+        {
+          "key": "google-play/{field}",
+          "path": "store/google-play/{locale}/{field}.txt",
+          "locales": {
+            "en": "en-US",
+            "de": "de-DE",
+            "fr": "fr-FR",
+            "zh": "zh-CN"
+          },
+          "fields": [
+            "title",
+            "short_description",
+            "full_description"
+          ]
+        }
+      ],
+      "placeholders": [],
+      "limits": {
+        "app-store/name": {
+          "chars": 30
+        },
+        "app-store/subtitle": {
+          "chars": 30
+        },
+        "app-store/keywords": {
+          "bytes": 100,
+          "keywords": true
+        },
+        "app-store/promotional_text": {
+          "chars": 170
+        },
+        "app-store/description": {
+          "chars": 4000,
+          "multiline": true
+        },
+        "google-play/title": {
+          "chars": 30
+        },
+        "google-play/short_description": {
+          "chars": 80
+        },
+        "google-play/full_description": {
+          "chars": 4000,
+          "multiline": true
+        }
+      }
+    },
+    {
+      "id": "flowplan-desktop",
+      "title": "Flowplan desktop",
+      "repo": "yannicschuller/flowplan-desktop",
+      "format": "flat-json",
+      "source": "en",
+      "reference": "de",
+      "targets": [
+        "fr",
+        "zh"
+      ],
+      "files": {
+        "en": "locales/en.json",
+        "de": "locales/de.json",
+        "fr": "locales/fr.json",
+        "zh": "locales/zh.json"
+      },
+      "context": "locales/context.json",
+      "placeholders": [
+        "index"
+      ]
+    }
+  ]
+}

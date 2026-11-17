@@ -1,0 +1,10 @@
+{
+  "server.empty": "Server address and health check (main.js)",
+  "server.httpsOnly": "Server address and health check (main.js)",
+  "server.unreachable": "Server address and health check (main.js)",
+  "server.redirects": "Server address and health check (main.js)",
+  "server.proxyAuth": "Server address and health check (main.js)",
+  "server.status": "Server address and health check (main.js)",
+  "server.notFound": "Server address and health check (main.js)",
+  "server.untrusted": "Server address and health check (main.js)"
+}

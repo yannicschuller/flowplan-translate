@@ -1,0 +1,10 @@
+{
+  "server.empty": "Bitte die Adresse deiner Flowplan-Instanz eingeben.",
+  "server.httpsOnly": "Nur HTTPS-Adressen sind erlaubt (HTTP nur für localhost).",
+  "server.unreachable": "Die Adresse ist nicht erreichbar ({0}). Prüfe die Schreibweise und deine Verbindung.",
+  "server.redirects": "Die Adresse leitet auf {0} weiter. Gib bitte diese Adresse ein.",
+  "server.proxyAuth": "Der Server verlangt zuerst eine Anmeldung (HTTP {0}), zum Beispiel an einem vorgeschalteten Proxy oder VPN. Melde dich dort an oder frag deine Administration.",
+  "server.status": "Der Server antwortet mit einem Fehler (HTTP {0}). Flowplan ist dort gerade nicht erreichbar.",
+  "server.notFound": "Unter {0} wurde keine Flowplan-Instanz gefunden ({1})",
+  "server.untrusted": "Das Zertifikat des Servers ist nicht vertrauenswürdig ({0}). Installiere die Zertifizierungsstelle deines Servers in der Zertifikatsverwaltung deines Systems oder vertraue dem Zertifikat beim Hinzufügen."
+}

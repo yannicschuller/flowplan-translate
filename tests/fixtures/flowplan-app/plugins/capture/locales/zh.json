@@ -1,0 +1,12 @@
+{
+  "heading": "保存到 Flowplan",
+  "cancel": "取消",
+  "save": "保存",
+  "close": "",
+  "titleField": "标题（可选）",
+  "textField": "正文（可选）",
+  "saved": "已保存到 {target}",
+  "failed": "",
+  "tooMany": "一次最多 {count} 个文件。",
+  "tooLarge": "{name} 超过 {mb} MB。"
+}

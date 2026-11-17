@@ -1,0 +1,16 @@
+{
+  "setupTitle": "Welcome to Flowplan",
+  "setupText": "Connect to app.flowplan.org or enter the address of your own Flowplan instance.",
+  "setupHint": "You can add more instances later in the app settings under “Profiles”. Switch there or by pressing and holding the app icon: “Switch profile”.",
+  "label": "Instance address",
+  "placeholder": "flowplan.your-company.com",
+  "connect": "Connect",
+  "connecting": "Connecting …",
+  "unreachable": "Nothing answers at {server}. Check the address and your internet connection.",
+  "redirect": "{server} redirects to {detail}. Please enter that address.",
+  "notFlowplan": "There is no Flowplan running at {server}.",
+  "connectingTo": "Connecting to {server} …",
+  "offlineServer": "{server} isn’t answering right now.",
+  "offlineCopyAt": "Offline copy on this device, updated {age}",
+  "tooManyProfiles": "At most {count} profiles."
+}

@@ -1,0 +1,16 @@
+{
+  "setupTitle": "欢迎使用 Flowplan",
+  "setupText": "连接到 app.flowplan.org，或输入你自己的 Flowplan 实例的地址。",
+  "setupHint": "以后可以在 应用设置的“账户”中添加更多实例。在那里切换，或按住 应用图标选择“切换账户”。",
+  "label": "",
+  "placeholder": "flowplan.your-company.com",
+  "connect": "连接",
+  "connecting": "正在连接…",
+  "unreachable": "",
+  "redirect": "{server} 重定向到了 {detail}。请输入该地址。",
+  "notFlowplan": "{server} 上没有运行 Flowplan。",
+  "connectingTo": "正在连接到 {server}…",
+  "offlineServer": "",
+  "offlineCopyAt": "此设备上的离线副本，更新于{age}",
+  "tooManyProfiles": "最多 {count} 个账户。"
+}

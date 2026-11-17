@@ -1,0 +1,16 @@
+{
+  "setupTitle": "Bienvenue dans Flowplan",
+  "setupText": "Connectez-vous à app.flowplan.org ou saisissez l’adresse de votre propre instance Flowplan.",
+  "setupHint": "",
+  "label": "Adresse de l’instance",
+  "placeholder": "flowplan.votre-entreprise.fr",
+  "connect": "Se connecter",
+  "connecting": "Connexion …",
+  "unreachable": "",
+  "redirect": "{server} redirige vers {detail}. Saisissez plutôt cette adresse.",
+  "notFlowplan": "Aucun Flowplan ne tourne à {server}.",
+  "connectingTo": "Connexion à {server} …",
+  "offlineServer": "{server} ne répond pas pour le moment.",
+  "offlineCopyAt": "",
+  "tooManyProfiles": "{count} profils au maximum."
+}

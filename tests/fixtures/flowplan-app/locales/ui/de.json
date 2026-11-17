@@ -1,0 +1,16 @@
+{
+  "setupTitle": "Willkommen bei Flowplan",
+  "setupText": "Verbinde dich mit app.flowplan.org oder gib die Adresse deiner eigenen Flowplan-Instanz ein.",
+  "setupHint": "Weitere Instanzen fügst du später in den App-Einstellungen unter „Profile“ hinzu. Wechseln kannst du dort oder, indem du das App-Symbol gedrückt hältst: „Profil wechseln“.",
+  "label": "Adresse der Instanz",
+  "placeholder": "flowplan.deine-firma.de",
+  "connect": "Verbinden",
+  "connecting": "Verbinde …",
+  "unreachable": "Unter {server} ist nichts erreichbar. Prüfe die Adresse und deine Internetverbindung.",
+  "redirect": "{server} leitet auf {detail} weiter. Gib bitte diese Adresse ein.",
+  "notFlowplan": "Unter {server} läuft kein Flowplan.",
+  "connectingTo": "Verbinde mit {server} …",
+  "offlineServer": "{server} antwortet gerade nicht.",
+  "offlineCopyAt": "Offline-Kopie auf diesem Gerät, aktualisiert {age}",
+  "tooManyProfiles": "Höchstens {count} Profile."
+}

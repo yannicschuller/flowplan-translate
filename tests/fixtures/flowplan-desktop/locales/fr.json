@@ -1,0 +1,10 @@
+{
+  "server.empty": "Veuillez saisir l'adresse de votre instance Flowplan.",
+  "server.httpsOnly": "Seules les adresses HTTPS sont autorisées (HTTP uniquement pour localhost).",
+  "server.unreachable": "",
+  "server.redirects": "L'adresse redirige vers {0}. Saisissez plutôt cette adresse.",
+  "server.proxyAuth": "Le serveur demande d'abord une connexion (HTTP {0}), par exemple à un proxy ou un VPN placé devant. Connectez-vous là ou demandez à votre administration.",
+  "server.status": "Le serveur répond par une erreur (HTTP {0}). Flowplan n'y est pas disponible pour le moment.",
+  "server.notFound": "Aucune instance Flowplan n'a été trouvée sous {0} ({1})",
+  "server.untrusted": ""
+}

@@ -1,0 +1,12 @@
+{
+  "heading": "Save to Flowplan",
+  "cancel": "Cancel",
+  "save": "Save",
+  "close": "Close",
+  "titleField": "Title (optional)",
+  "textField": "Text (optional)",
+  "saved": "Saved to {target}",
+  "failed": "Not saved: {error}",
+  "tooMany": "At most {count} files at once.",
+  "tooLarge": "{name} is larger than {mb} MB."
+}

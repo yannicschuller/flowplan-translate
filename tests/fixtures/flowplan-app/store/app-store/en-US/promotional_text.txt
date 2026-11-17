@@ -1,0 +1,1 @@
+New: widgets to check off tasks, Live Activities and Siri. Documents, databases, whiteboards and a journal – on app.flowplan.org or your own server.

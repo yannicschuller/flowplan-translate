@@ -1,0 +1,12 @@
+{
+  "Add a task": "添加任务",
+  "Adds a task to a list or database in Flowplan.": "在 Flowplan 的列表或数据库中添加任务。",
+  "What's the task?": "任务是什么？",
+  "Due": "",
+  "List": "列表",
+  "Added to %@": "已添加到 %@",
+  "Added to %@, due %@": "已添加到 %@，%@ 到期",
+  "%d due today": "",
+  "%d overdue": "%d 项逾期",
+  "%@: %@": "%@：%@"
+}

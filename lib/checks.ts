@@ -1,0 +1,110 @@
+// The checks on save. Errors block saving, hints are shown but saving is
+// allowed. Client-safe: the editor runs them while typing, the server runs
+// them again on every save and accept.
+import { comparePlaceholders } from "./placeholders";
+import type { CheckResult, Format, GlossaryEntry, Issue, Limit, PlaceholderStyle } from "./types";
+
+export const MAX_INPUT = 10_000;
+
+// Characters and bytes as flowplan-app's store test counts them: on the
+// trimmed text, characters as code points, bytes in UTF-8.
+export const countChars = (text: string) => [...text.trim()].length;
+export const countBytes = (text: string) => new TextEncoder().encode(text.trim()).length;
+
+// C0 controls except tab and line feed, DEL, and the C1 range. Line ends
+// are normalised to \n before the check, so a \r is an error here too.
+const CONTROL = /[\u0000-\u0008\u000b-\u001f\u007f-\u009f]/;
+
+// Final punctuation, with the full-width and French forms counted as the same.
+const FINAL: Record<string, string> = {
+  ".": ".", "。": ".", "．": ".",
+  "!": "!", "！": "!",
+  "?": "?", "？": "?",
+  ":": ":", "：": ":",
+  ";": ";", "；": ";",
+  ",": ",", "，": ",", "、": ",",
+  "…": "…",
+};
+function finalPunctuation(text: string) {
+  const trimmed = text.trimEnd();
+  if (trimmed.endsWith("...")) return "…";
+  return FINAL[trimmed.slice(-1)] ?? "";
+}
+
+const escapeRegex = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+// The term as a word of its own, also in the plural ("Workspace", "Workspaces").
+export function termRegex(term: string) {
+  return new RegExp(`(?<![\\p{L}\\p{N}])${escapeRegex(term.trim())}(?:s|es)?(?![\\p{L}\\p{N}])`, "iu");
+}
+export function glossaryHits(source: string, glossary: GlossaryEntry[]) {
+  return glossary.filter((g) => g.term.trim() && termRegex(g.term).test(source));
+}
+// Is the glossary translation (or one of its " / " alternatives) used?
+// Words may take a plural s or x ("Espace de travail" → "Espaces de travail").
+function usesTranslation(text: string, translation: string) {
+  return translation
+    .split(/\s+\/\s+/)
+    .map((alt) => alt.trim())
+    .filter(Boolean)
+    .some((alt) => {
+      const pattern = alt
+        .split(/\s+/)
+        .map((word) => escapeRegex(word) + (/^\p{L}{3,}$/u.test(word) ? "[sx]?" : ""))
+        .join("\\s+");
+      return new RegExp(pattern, "iu").test(text);
+    });
+}
+
+export type CheckInput = {
+  source: string;
+  text: string;
+  format: Format;
+  limit?: Limit;
+  placeholders: PlaceholderStyle[];
+  glossary?: GlossaryEntry[];
+};
+
+export function checkTranslation(input: CheckInput): CheckResult {
+  const { source, text, format } = input;
+  const errors: Issue[] = [];
+  const hints: Issue[] = [];
+  if (text.length > MAX_INPUT) return { errors: [{ code: "too_long_input", limit: MAX_INPUT, actual: text.length }], hints };
+  if (!text.trim()) return { errors: [{ code: "empty" }], hints };
+
+  const { missing, extra } = comparePlaceholders(source, text, input.placeholders);
+  if (missing.length) errors.push({ code: "placeholders_missing", values: missing });
+  if (extra.length) errors.push({ code: "placeholders_extra", values: extra });
+
+  if (CONTROL.test(text)) errors.push({ code: "control_chars" });
+  const multiline = input.limit?.multiline ?? format !== "txt-files";
+  if (!multiline && text.includes("\n")) errors.push({ code: "line_breaks" });
+  // A txt file holds the text plus the file's own trailing newline: no
+  // leading or trailing blanks or extra lines.
+  if (format === "txt-files" && text !== text.trim()) errors.push({ code: "edge_whitespace_txt" });
+
+  const limit = input.limit;
+  if (limit?.chars !== undefined && countChars(text) > limit.chars) errors.push({ code: "too_many_chars", limit: limit.chars, actual: countChars(text) });
+  if (limit?.bytes !== undefined && countBytes(text) > limit.bytes) errors.push({ code: "too_many_bytes", limit: limit.bytes, actual: countBytes(text) });
+  if (limit?.keywords) {
+    const words = text.trim().split(",");
+    if (!words.every((w) => w && w === w.trim())) errors.push({ code: "keywords_format" });
+    const seen = new Set<string>();
+    const repeated = words.filter((w) => (seen.has(w) ? true : (seen.add(w), false)));
+    if (repeated.length) errors.push({ code: "keywords_repeat", values: [...new Set(repeated)] });
+  }
+
+  if (format !== "txt-files") {
+    const lead = (s: string) => /^\s*/.exec(s)![0];
+    const trail = (s: string) => /\s*$/.exec(s)![0];
+    if (lead(source) !== lead(text) || trail(source) !== trail(text)) hints.push({ code: "whitespace_differs" });
+  }
+  const want = finalPunctuation(source);
+  const have = finalPunctuation(text);
+  if (want !== have) hints.push({ code: "punctuation_differs", values: [want, have] });
+  for (const g of glossaryHits(source, input.glossary || []))
+    if (g.translation.trim() && !usesTranslation(text, g.translation)) hints.push({ code: "glossary_unused", values: [g.term, g.translation] });
+  return { errors, hints };
+}
+
+// Line ends as the editor and the files use them internally.
+export const normalizeText = (text: string) => text.replace(/\r\n?/g, "\n");

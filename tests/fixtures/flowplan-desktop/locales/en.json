@@ -1,0 +1,10 @@
+{
+  "server.empty": "Please enter the address of your Flowplan instance.",
+  "server.httpsOnly": "Only HTTPS addresses are allowed (HTTP only for localhost).",
+  "server.unreachable": "The address cannot be reached ({0}). Check the spelling and your connection.",
+  "server.redirects": "The address redirects to {0}. Please enter that address instead.",
+  "server.proxyAuth": "The server asks you to sign in first (HTTP {0}), for example at a proxy or VPN in front of it. Sign in there or ask your administrator.",
+  "server.status": "The server answers with an error (HTTP {0}). Flowplan is not available there right now.",
+  "server.notFound": "No Flowplan instance was found at {0} ({1})",
+  "server.untrusted": "The server's certificate is not trusted ({0}). Install your server's certificate authority in your system's certificate store or trust the certificate when adding the server."
+}

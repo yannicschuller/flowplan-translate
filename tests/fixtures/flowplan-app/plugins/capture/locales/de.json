@@ -1,0 +1,12 @@
+{
+  "heading": "In Flowplan sichern",
+  "cancel": "Abbrechen",
+  "save": "Sichern",
+  "close": "Schließen",
+  "titleField": "Titel (optional)",
+  "textField": "Text (optional)",
+  "saved": "Gesichert in {target}",
+  "failed": "Nicht gesichert: {error}",
+  "tooMany": "Höchstens {count} Dateien auf einmal.",
+  "tooLarge": "{name} ist größer als {mb} MB."
+}
