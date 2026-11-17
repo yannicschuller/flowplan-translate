@@ -74,6 +74,28 @@ While the tool's pull request for a repository is open (tracked in the database 
 
 Per language: term → translation, with a note, plus one note per language (French: "vous" everywhere). Seeded on the first start with Flowplan's core terms as the existing catalogues render them (Workspace → Espace de travail / 工作区, Database → Base de données / 数据库, Journal → Journal / 日记, …). The editor shows the terms found in a text.
 
+### Badges
+
+Coverage badges for READMEs, rendered as SVG by the tool itself (no external service, no web fonts):
+
+| URL | Coverage of |
+| --- | --- |
+| `<TRANSLATE_URL>/api/badge?repo=flowplan&lang=fr` | all components of a repository (its name, or `owner/name`) |
+| `<TRANSLATE_URL>/api/badge?component=flowplan-web&lang=zh` | one component |
+| `<TRANSLATE_URL>/api/badge?lang=fr` | everything |
+
+- `lang` is required (`fr` or `zh`); without it the answer is 400. An unknown language, repository or component gives a grey "unknown" badge with status 404.
+- Coverage = current translations that are not outdated ÷ texts (not removed), as on the overview, from the state of the last sync. The message is the floored percentage ("97 %"), coloured like flowplan's README table: 100 % `#2ea44f`, from 90 % `#a3c51c`, from 50 % `#dfb317`, below `#e05d44`.
+- The label is the language's own name (Français, 简体中文); `&label=…` replaces it.
+- `&format=json` returns the [shields.io endpoint](https://shields.io/badges/endpoint-badge) format `{"schemaVersion":1,"label":…,"message":…,"color":…}` with `Access-Control-Allow-Origin: *`.
+- Cached for 10 minutes (`Cache-Control: public, max-age=600`). The endpoint never reads or sets cookies.
+
+The overview has a "Badge for your README" disclosure per repository with the Markdown for each language, e.g.:
+
+```md
+[![Français](https://translate.flowplan.org/api/badge?repo=flowplan&lang=fr)](https://translate.flowplan.org/c/flowplan-web/fr)
+```
+
 ## Privacy and security
 
 - No tracking, no analytics, no external fonts, scripts or CDNs.

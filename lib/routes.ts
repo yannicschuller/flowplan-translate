@@ -27,6 +27,7 @@ import { createPullRequest } from "./export";
 import { one } from "./db";
 
 export { webhookRoute } from "./webhook";
+export { badgeRoute } from "./badge";
 
 export function healthRoute() {
   one("SELECT 1");

@@ -616,6 +616,43 @@ form.inline {
   }
 }
 
+details.badges summary {
+  cursor: pointer;
+  color: var(--secondary);
+  font-size: 13px;
+  font-weight: 560;
+}
+details.badges {
+  min-width: 0;
+}
+details.badges[open] {
+  display: grid;
+  gap: 10px;
+}
+.badge-snippet {
+  min-width: 0;
+  display: grid;
+  gap: 6px;
+  justify-items: start;
+}
+.badge-snippet pre {
+  margin: 0;
+  width: 100%;
+  overflow-x: auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 12px;
+  user-select: all;
+}
+.badge-snippet code {
+  background: none;
+  border: 0;
+  padding: 0;
+  overflow-wrap: normal;
+}
+
 /* ---------- List ---------- */
 .toolbar {
   display: flex;

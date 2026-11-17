@@ -72,6 +72,13 @@ test("translate, see the placeholder check block, fix it, accept as reviewer", a
   // The overview now offers a pull request for the accepted text.
   await review.goto("/");
   await expect(review.getByRole("button", { name: /Create pull request \(1\)/ })).toBeEnabled();
+  // The README badge of the repository, as a browser loads it.
+  const badge = await review.request.get("/api/badge?repo=flowplan&lang=fr");
+  expect(badge.status()).toBe(200);
+  expect(badge.headers()["content-type"]).toBe("image/svg+xml; charset=utf-8");
+  expect(badge.headers()["set-cookie"]).toBeUndefined();
+  expect(await badge.text()).toContain("Français");
+
   // The originals: German is browsable and read-only, a text without German says so.
   await review.goto("/c/flowplan-web/de?q=checked");
   await expect(review.getByRole("heading", { level: 1 })).toContainText("Deutsch");

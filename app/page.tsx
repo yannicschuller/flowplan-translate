@@ -8,6 +8,7 @@ import { formatDateTime, formatNumber } from "@/lib/i18n";
 import { LANG_NAMES, ORIGINAL_LANGS } from "@/lib/types";
 import { errorMessage } from "@/lib/notices";
 import { config } from "@/lib/config";
+import { badgeMarkdown } from "@/lib/badge";
 import { ProgressBar } from "@/components/progress-bar";
 
 export const dynamic = "force-dynamic";
@@ -197,6 +198,24 @@ export default async function Overview({ searchParams }: { searchParams: Promise
                   ])}
                 </tbody>
               </table>
+              <details className="badges">
+                <summary>{t("Badge für dein README", "Badge for your README")}</summary>
+                <p className="muted small">
+                  {t("Der Stand dieser Sprache über alle Bereiche des Repositorys, verlinkt auf die Liste zum Übersetzen:", "This language's coverage across all parts of the repository, linked to the list to translate:")}
+                </p>
+                {[...new Set(componentsOf(repo).flatMap((c) => c.targets))].map((lang) => {
+                  const first = componentsOf(repo).find((c) => c.targets.includes(lang))!;
+                  const name = repo.split("/")[1];
+                  return (
+                    <div key={lang} className="badge-snippet">
+                      <img src={`/api/badge?repo=${encodeURIComponent(name)}&lang=${lang}`} alt={`${LANG_NAMES[lang].native} – ${t("Badge", "badge")}`} height={20} />
+                      <pre>
+                        <code>{badgeMarkdown(config.publicUrl(), repo, lang, first.id)}</code>
+                      </pre>
+                    </div>
+                  );
+                })}
+              </details>
             </section>
           );
         })}

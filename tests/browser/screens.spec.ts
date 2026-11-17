@@ -18,7 +18,7 @@ test("main pages at desktop and phone width, light and dark, de and en", async (
   test.setTimeout(300_000);
   const seed = JSON.parse(readFileSync(join(dataDir, "browser-test.json"), "utf8")) as { reviewer: string; entry: number };
   const pages = [
-    { name: "overview", path: "/", signedIn: true },
+    { name: "overview", path: "/", signedIn: true, open: "details.badges summary" },
     { name: "list", path: "/c/flowplan-web/fr?filter=all", signedIn: true },
     { name: "editor", path: `/c/flowplan-web/fr/${seed.entry}`, signedIn: true },
     { name: "store-editor", path: "/c/flowplan-app-store/zh?filter=all", signedIn: true, first: "app-store/description" },
@@ -37,6 +37,7 @@ test("main pages at desktop and phone width, light and dark, de and en", async (
           await context.clearCookies();
           if (p.signedIn) await context.addCookies([{ name: "ft_session", value: seed.reviewer, url: baseURL!, httpOnly: true, sameSite: "Lax" }]);
           await page.goto(p.path);
+          if (p.open) await page.locator(p.open).first().click();
           if (p.first) await page.locator(".entry").filter({ hasText: p.first }).first().click({ timeout: 10_000 });
           await page.waitForLoadState("networkidle");
           const wide = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
