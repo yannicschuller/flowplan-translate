@@ -45,7 +45,13 @@ On every save (in the browser while typing, and again on the server):
 - **Blocking**: the same placeholders as the source (as a multiset, order may change), not empty, length limits, single-line fields without line breaks, no control characters, txt fields without leading/trailing blanks or extra lines, App Store keywords (comma-separated, no spaces around commas, no repeats), at most 10,000 characters.
 - **Hints** (saving allowed): leading/trailing whitespace differs from the source, final punctuation differs (full-width and French forms count as the same), a glossary term in the source whose glossary translation is not used.
 
+In the editor, placeholders in the English source and the German reference appear as chips. Below the field there is one button per placeholder of the source: it inserts the placeholder at the caret and shows whether the translation already uses it as often as the source does. A live preview fills in sample values, which you can edit in the browser (they are never saved), for both the translation and the source.
+
 Translations are always shown as text, never as HTML.
+
+### Originals
+
+English (the source) and German (the reference) are shown read-only as "Original" languages: on the overview per component, and as lists to browse and search. An entry shows key, English, German, context and glossary terms. A text without German in the reference file (`""`) is marked "only in the code". The tool never writes either language, and saving English or German is refused (400).
 
 ### Outdated
 

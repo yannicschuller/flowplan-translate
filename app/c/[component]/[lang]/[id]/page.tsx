@@ -8,6 +8,7 @@ import { listHref } from "@/lib/list-href";
 import { languageNote } from "@/lib/glossary";
 import { Editor } from "@/components/editor";
 import { OriginalEntry } from "@/components/original-entry";
+import { PlaceholderText } from "@/components/placeholder-text";
 
 export const dynamic = "force-dynamic";
 type Props = { params: Promise<{ component: string; lang: string; id: string }>; searchParams: Promise<Record<string, string | string[] | undefined>> };
@@ -77,7 +78,7 @@ export default async function EntryPage({ params, searchParams }: Props) {
             <div>
               <div className="field-label">{t("Englisch (Ausgangstext)", "English (source)")}</div>
               <p className="text source-text" lang="en">
-                {s.source}
+                <PlaceholderText text={s.source} styles={c.placeholders} />
               </p>
             </div>
             {s.de_reference &&
@@ -85,14 +86,14 @@ export default async function EntryPage({ params, searchParams }: Props) {
                 <details className="fold">
                   <summary className="field-label">{t("Deutsch (Referenz)", "German (reference)")}</summary>
                   <p className="text reference-text" lang="de">
-                    {s.de_reference}
+                    <PlaceholderText text={s.de_reference} styles={c.placeholders} />
                   </p>
                 </details>
               ) : (
                 <div>
                   <div className="field-label">{t("Deutsch (Referenz)", "German (reference)")}</div>
                   <p className="text reference-text" lang="de">
-                    {s.de_reference}
+                    <PlaceholderText text={s.de_reference} styles={c.placeholders} />
                   </p>
                 </div>
               ))}

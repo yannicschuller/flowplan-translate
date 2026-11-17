@@ -727,6 +727,9 @@ form.inline {
 .entry.original {
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
 }
+.entry.original .target {
+  color: var(--secondary);
+}
 @media (max-width: 720px) {
   .entry.original {
     grid-template-columns: minmax(0, 1fr);
@@ -882,6 +885,72 @@ details.fold summary {
 }
 details.fold[open] summary {
   margin-bottom: 4px;
+}
+
+/* Placeholders as chips: in the texts, as insert buttons, in the preview. */
+.ph {
+  font-family: var(--font-mono);
+  font-size: 0.82em;
+  background: var(--blue-light);
+  color: var(--accent-strong);
+  border-radius: 5px;
+  padding: 0 4px;
+  margin: 0 1px;
+  white-space: nowrap;
+}
+.ph-insert {
+  display: grid;
+  gap: 2px;
+}
+.ph-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 3px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  cursor: pointer;
+  font-size: 13px;
+}
+.ph-chip:hover {
+  background: var(--hover);
+}
+.ph-chip.missing {
+  border-color: var(--err);
+  background: var(--err-bg);
+  color: var(--err);
+}
+.ph-chip.done {
+  color: var(--muted);
+}
+.ph-chip.done .ph-count {
+  color: var(--ok);
+}
+.ph-count {
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.preview-values {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 8px;
+}
+.preview-values label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.preview-values input {
+  min-width: 0;
+  padding: 5px 8px;
+  font-size: 14px;
+}
+.preview-text {
+  font-size: 15px;
 }
 
 /* ---------- Glossary ---------- */

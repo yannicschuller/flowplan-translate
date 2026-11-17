@@ -40,6 +40,16 @@ test("translate, see the placeholder check block, fix it, accept as reviewer", a
   await expect(page.locator(".notice.err")).toContainText("Not saved");
   await expect(page).toHaveURL(new RegExp(`${url}$`));
 
+  // The chip of the missing placeholder inserts it at the caret; the check clears.
+  const chip = page.locator(".ph-chip.missing", { hasText: "{0}" });
+  await expect(chip).toBeVisible();
+  await chip.click();
+  await expect(field).toBeFocused();
+  await expect(page.locator(".issues .error")).toHaveCount(0);
+  await expect(page.locator(".ph-chip.done", { hasText: "{0}" })).toBeVisible();
+  await expect(page.getByTestId("preview-translation")).toContainText("3");
+  expect(await field.inputValue()).toContain("{0}");
+
   const fixed = `${source} (fr)`;
   await field.fill(fixed);
   await expect(page.locator(".issues .error")).toHaveCount(0);

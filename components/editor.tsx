@@ -5,7 +5,8 @@
 // Everything is rendered as React text – never as HTML.
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useT } from "./i18n";
+import { useLocale, useT } from "./i18n";
+import { fillPreview, placeholderUsage, sampleValues } from "@/lib/preview";
 import { checkTranslation, countBytes, countChars } from "@/lib/checks";
 import { issueMessage } from "@/lib/issue-messages";
 import { listHref, type ListState } from "@/lib/list-href";
@@ -48,6 +49,23 @@ export function Editor(props: EditorProps) {
           ? t("Bestätigt.", "Confirmed.")
           : t("Übersetzung akzeptiert.", "Translation accepted.");
   const area = useRef<HTMLTextAreaElement>(null);
+  const locale = useLocale();
+  // Sample values for the preview: only here in the browser, never saved.
+  const [samples, setSamples] = useState(() => sampleValues(props.source, props.placeholders, locale));
+  const usage = useMemo(() => placeholderUsage(props.source, text, props.placeholders), [props.source, text, props.placeholders]);
+
+  // Puts a placeholder at the caret (replacing a selection) and keeps the caret after it.
+  const insert = (token: string) => {
+    const el = area.current;
+    const start = el ? el.selectionStart : text.length;
+    const end = el ? el.selectionEnd : text.length;
+    setText(text.slice(0, start) + token + text.slice(end));
+    requestAnimationFrame(() => {
+      if (!el) return;
+      el.focus();
+      el.setSelectionRange(start + token.length, start + token.length);
+    });
+  };
   const signedIn = props.role !== null;
   const reviewer = props.role === "reviewer";
 
@@ -127,6 +145,7 @@ export function Editor(props: EditorProps) {
   // A new entry (after "save and next"): its own text and a clean slate.
   useEffect(() => {
     setText(props.initial);
+    setSamples(sampleValues(props.source, props.placeholders, locale));
     setMessage(props.saved ? { kind: "ok", text: savedText(props.saved) } : null);
     area.current?.focus();
   }, [props.stringId, props.initial, props.saved]);
@@ -188,6 +207,33 @@ export function Editor(props: EditorProps) {
             )}
           </div>
         </div>
+        {usage.length > 0 && signedIn && (
+          <div className="ph-insert">
+            <span className="field-label">{t("Platzhalter einfügen", "Insert placeholder")}</span>
+            <div className="row">
+              {usage.map((u) => {
+                const done = u.have >= u.want;
+                return (
+                  <button
+                    key={u.token}
+                    type="button"
+                    className={done ? "ph-chip done" : "ph-chip missing"}
+                    // Keep the caret in the field.
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => insert(u.token)}
+                    aria-label={`${t("Einfügen", "Insert")} ${u.token} (${u.have}/${u.want})`}
+                    title={done ? t("schon so oft wie im Ausgangstext", "used as often as in the source") : t("fehlt noch", "still missing")}
+                  >
+                    <span className="mono">{u.token}</span>
+                    <span className="ph-count" aria-hidden="true">
+                      {done ? "✓" : `${u.have}/${u.want}`}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
         {live && (live.errors.length > 0 || live.hints.length > 0) && (
           <ul className="issues" aria-live="polite">
             {live.errors.map((issue, i) => (
@@ -228,6 +274,37 @@ export function Editor(props: EditorProps) {
           </button>
         </div>
       </section>
+
+      {usage.length > 0 && (
+        <section className="card stack preview" aria-labelledby="preview-label">
+          <h2 id="preview-label">{t("Vorschau mit Beispielwerten", "Preview with sample values")}</h2>
+          <div className="preview-values">
+            {usage.map((u, i) => (
+              <label key={u.token}>
+                <span className="ph">{u.token}</span>
+                <input
+                  id={`sample-${i}`}
+                  value={samples[u.token] ?? ""}
+                  maxLength={100}
+                  onChange={(e) => setSamples({ ...samples, [u.token]: e.target.value })}
+                />
+              </label>
+            ))}
+          </div>
+          <div>
+            <div className="field-label">{reviewer ? t("Übersetzung", "Translation") : t("Dein Vorschlag", "Your suggestion")}</div>
+            <p className="text preview-text" lang={props.lang} data-testid="preview-translation">
+              {text ? fillPreview(text, props.placeholders, samples) : <span className="muted">–</span>}
+            </p>
+          </div>
+          <div>
+            <div className="field-label">{t("Englisch (Ausgangstext)", "English (source)")}</div>
+            <p className="text preview-text muted" lang="en">
+              {fillPreview(props.source, props.placeholders, samples)}
+            </p>
+          </div>
+        </section>
+      )}
 
       <section className="card stack" aria-labelledby="suggestions-label">
         <h2 id="suggestions-label">{t("Vorschläge", "Suggestions")}</h2>

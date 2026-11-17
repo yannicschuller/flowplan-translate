@@ -5,6 +5,7 @@ import { originalDetail } from "@/lib/store";
 import { listHref } from "@/lib/list-href";
 import { LANG_NAMES, type OriginalLang } from "@/lib/types";
 import type { T } from "@/lib/i18n";
+import { PlaceholderText } from "./placeholder-text";
 
 export function OriginalEntry({ detail, lang, q, page, t }: { detail: NonNullable<ReturnType<typeof originalDetail>>; lang: OriginalLang; q: string; page: number; t: T }) {
   const { string: s, component: c } = detail;
@@ -15,7 +16,7 @@ export function OriginalEntry({ detail, lang, q, page, t }: { detail: NonNullabl
       <div className="field-label">{lang === "de" ? t("Deutsch", "German") : t("Deutsch (Referenz)", "German (reference)")}</div>
       {s.de_reference ? (
         <p className={lang === "de" ? "text source-text" : "text reference-text"} lang="de">
-          {s.de_reference}
+          <PlaceholderText text={s.de_reference} styles={c.placeholders} />
         </p>
       ) : (
         <p className="muted">
@@ -28,7 +29,7 @@ export function OriginalEntry({ detail, lang, q, page, t }: { detail: NonNullabl
     <div>
       <div className="field-label">{t("Englisch (Ausgangstext)", "English (source)")}</div>
       <p className={lang === "en" ? "text source-text" : "text reference-text"} lang="en">
-        {s.source}
+        <PlaceholderText text={s.source} styles={c.placeholders} />
       </p>
     </div>
   );
