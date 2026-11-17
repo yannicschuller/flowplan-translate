@@ -4,6 +4,7 @@ node_modules
 .git
 .env*
 data
-data-demo
+.github
+data-test
 test-results
 playwright-report
