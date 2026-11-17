@@ -12,6 +12,7 @@ import { sha256 } from "./secret";
 import { adapters, FormatError, type Entry } from "./formats";
 import { allPaths, catalogueFile, componentsOf, txtFiles } from "./components";
 import { repoClient, GitHubError } from "./github";
+import { refreshPulls } from "./pulls";
 import type { Component } from "./types";
 
 // code "app_not_installed": shown as a readable sentence on the overview.
@@ -249,6 +250,8 @@ export async function syncRepo(repo: string): Promise<SyncState> {
         errors.push({ component: c.id, message: (error as Error).message });
       }
     }
+    // The tool's pull requests: still open, closed or merged?
+    await refreshPulls(repo, client);
   } catch (error) {
     if (!(error instanceof GitHubError)) console.error(error);
     errors.push({ component: null, message: (error as Error).message, ...(error instanceof GitHubError && error.code ? { code: error.code } : {}) });

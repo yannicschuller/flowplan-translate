@@ -122,6 +122,8 @@ const MIGRATIONS: string[] = [
     ),
     ...LANGUAGE_NOTES_SEED.map((n) => `INSERT OR IGNORE INTO language_notes(lang,note,updated_at) VALUES(${sqlString(n.lang)},${sqlString(n.note)},0);`),
   ].join("\n"),
+  // 3: when the state of a tracked pull request was last checked on GitHub
+  `ALTER TABLE pull_requests ADD COLUMN checked_at INTEGER;`,
 ];
 export const SCHEMA_VERSION = MIGRATIONS.length;
 

@@ -9,12 +9,15 @@ import { LANG_NAMES, ORIGINAL_LANGS } from "@/lib/types";
 import { errorMessage } from "@/lib/notices";
 import { config } from "@/lib/config";
 import { badgeMarkdown } from "@/lib/badge";
+import { refreshPullsIfStale } from "@/lib/pulls";
 import { ProgressBar } from "@/components/progress-bar";
 
 export const dynamic = "force-dynamic";
 
 export default async function Overview({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const [{ t, locale }, user, sp] = await Promise.all([pageT(), pageUser(), searchParams]);
+  // "Open pull request #n" only while GitHub says so (checked at most every five minutes, briefly).
+  await Promise.all(repos().map((repo) => refreshPullsIfStale(repo)));
   const reviewer = user?.role === "reviewer";
   const param = (k: string) => (typeof sp[k] === "string" ? (sp[k] as string) : "");
   const n = (v: number) => formatNumber(locale, v);

@@ -59,7 +59,7 @@ Every translation stores the hash of the source text it was based on (`based_on_
 
 ### Sync
 
-- **Webhook**: GitHub sends `push` events to `<TRANSLATE_URL>/api/github/webhook`. The `X-Hub-Signature-256` HMAC is checked with `TRANSLATE_WEBHOOK_SECRET` (constant-time); other events, other repositories and other branches are ignored. The answer comes at once (202) and the sync runs in the background, one at a time per repository.
+- **Webhook**: GitHub sends `push` (and `pull_request`, see below) events to `<TRANSLATE_URL>/api/github/webhook`. The `X-Hub-Signature-256` HMAC is checked with `TRANSLATE_WEBHOOK_SECRET` (constant-time); other events, other repositories and other branches are ignored. The answer comes at once (202) and the sync runs in the background, one at a time per repository.
 - **"Sync now"** on the overview, for reviewers.
 
 A sync reads the catalogues of the repository's main branch through the contents API (with the App's installation token) and stores the commit per repository. New source texts appear, removed ones are hidden (never deleted, their translations stay), changed ones make their translations outdated. Target-language values are re-imported: a value someone edited in the repository directly wins and becomes the accepted one – unless the tool holds a newer accepted value that is not in the repository yet; then the tool's value is kept and a note says so. A file that does not exist (yet) is reported per component on the overview (to reviewers) instead of failing the sync.
@@ -68,7 +68,9 @@ A sync reads the catalogues of the repository's main branch through the contents
 
 "Create pull request" (per repository, reviewers) collects every accepted translation that differs from main, fetches the catalogue files **fresh from main**, rewrites them format-preservingly and commits only the changed files through the Git Data API (blobs, tree, commit, ref) on a branch `translate/<yyyy-mm-dd>-<shortid>`. The pull request against main lists the languages with counts, the changed texts (collapsed) and the contributors; the commit message carries `Co-authored-by: login <id+login@users.noreply.github.com>` for every author. The translations are marked `exported` with the pull request number.
 
-While the tool's pull request for a repository is open (tracked in the database and checked through the API), the next export pushes a new commit to its branch (a merge of main when main moved) and updates the description instead of opening a second one. Once main contains the values (after merging), the next sync marks them simply accepted. A pull request closed without merging is forgotten; its translations go into the next one.
+While the tool's pull request for a repository is open (tracked in the database and checked through the API), the next export pushes a new commit to its branch (a merge of main when main moved) and updates the description instead of opening a second one. Once main contains the values (after merging), the next sync marks them simply accepted. A pull request closed without merging is forgotten and its translations count as pending export again right away; they go into the next one.
+
+The overview shows "open pull request #n" only while GitHub says so. The state of the tool's pull requests is checked on every sync (webhook and "Sync now"), on the overview when the last check is older than five minutes (one call per tracked open pull request, waiting at most 2.5 s, errors only logged), and at once by `pull_request` webhook events (closed, merged or not; reopened) when the App subscribes to them. Pull requests the tool doesn't track are ignored.
 
 ### Glossary
 
@@ -134,7 +136,7 @@ Create a GitHub App (Settings → Developer settings → GitHub Apps → New):
 2. **Callback URL**: `<TRANSLATE_URL>/api/auth/callback`. Leave "Expire user authorization tokens" as you like; **"Request user authorization (OAuth) during installation" off**.
 3. **Webhook**: active, URL `<TRANSLATE_URL>/api/github/webhook`, a long random secret (→ `TRANSLATE_WEBHOOK_SECRET`).
 4. **Repository permissions**: Contents **read & write**, Pull requests **read & write**, Metadata **read**. No account permissions.
-5. **Subscribe to events**: **Push**.
+5. **Subscribe to events**: **Push** and **Pull request** (the latter updates the state of the tool's pull requests at once; without it, the next sync or the overview does it).
 6. Create the App, note the App ID and client id, generate a client secret and a private key.
 7. **Install** the App on the repositories in `components.json` (yannicschuller/flowplan, flowplan-app, flowplan-desktop).
 

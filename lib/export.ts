@@ -11,6 +11,7 @@ import { adapters } from "./formats";
 import { catalogueFile, componentsOf, txtFiles } from "./components";
 import { repoClient, GitHubError } from "./github";
 import { config } from "./config";
+import { markPull } from "./pulls";
 import type { SessionUser } from "./auth";
 import type { Component } from "./types";
 
@@ -126,7 +127,7 @@ export async function createPullRequest(user: SessionUser, repo: string, at = no
     if (open) {
       const pull = await client.pull(open.number);
       if (pull.state !== "open") {
-        run("UPDATE pull_requests SET state=?,updated_at=? WHERE repo=? AND number=?", pull.merged ? "merged" : "closed", at, repo, open.number);
+        markPull(repo, open.number, pull.merged ? "merged" : "closed", at);
         open = null;
       }
     }
@@ -212,7 +213,7 @@ export async function createPullRequest(user: SessionUser, repo: string, at = no
       const pull = await client.updatePull(open.number, { body });
       number = pull.number;
       url = pull.html_url;
-      run("UPDATE pull_requests SET base_sha=?,updated_at=? WHERE repo=? AND number=?", mainSha, at, repo, open.number);
+      run("UPDATE pull_requests SET base_sha=?,checked_at=?,updated_at=? WHERE repo=? AND number=?", mainSha, at, at, repo, open.number);
     } else {
       const name = branchName(at);
       const commit = await client.createCommit(message, tree, [mainSha]);
@@ -221,7 +222,7 @@ export async function createPullRequest(user: SessionUser, repo: string, at = no
       number = pull.number;
       url = pull.html_url;
       created = true;
-      run("INSERT INTO pull_requests(repo,number,branch,state,base_sha,created_at,updated_at) VALUES(?,?,?,'open',?,?,?)", repo, number, name, mainSha, at, at);
+      run("INSERT INTO pull_requests(repo,number,branch,state,base_sha,checked_at,created_at,updated_at) VALUES(?,?,?,'open',?,?,?,?)", repo, number, name, mainSha, at, at, at);
     }
     transaction(() => {
       for (const r of included) run("UPDATE translations SET status='exported',pr_number=?,updated_at=? WHERE id=? AND status IN ('accepted','exported')", number, at, r.id);
