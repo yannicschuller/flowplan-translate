@@ -517,7 +517,6 @@ form.inline {
   font-weight: 560;
 }
 .progress-cell {
-  width: 32%;
   min-width: 120px;
 }
 .progress {
@@ -557,34 +556,55 @@ form.inline {
 .dot.outdated {
   background: var(--warn);
 }
+.progress-table {
+  table-layout: fixed;
+}
+.progress-table .component-cell {
+  width: 30%;
+}
+.progress-table .lang {
+  width: 14%;
+}
+.progress-table .num {
+  width: 11%;
+}
 @media (max-width: 720px) {
   .progress-table thead {
     display: none;
   }
   .progress-table tr {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 4px 10px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 14px;
     padding: 10px 0;
     border-top: 1px solid var(--border);
   }
-  .progress-table td {
+  .progress-table td,
+  .progress-table .component-cell,
+  .progress-table .lang,
+  .progress-table .num {
     border: 0;
     padding: 0;
+    width: auto;
   }
   .progress-table .component-cell {
-    grid-column: 1 / -1;
+    flex: 1 1 auto;
+    min-width: 0;
   }
   .progress-table .progress-cell {
-    grid-column: 1 / -1;
+    flex: 1 1 100%;
     width: auto;
+    min-width: 0;
+    padding: 4px 0;
+  }
+  .progress-table .num {
+    text-align: left;
+    font-size: 13px;
   }
   .progress-table .num::before {
     content: attr(data-label) " ";
     color: var(--muted);
-  }
-  .progress-table .num {
-    text-align: left;
   }
 }
 
@@ -835,6 +855,14 @@ form.inline {
   font-size: 12px;
 }
 
+details.fold summary {
+  cursor: pointer;
+  margin-bottom: 0;
+}
+details.fold[open] summary {
+  margin-bottom: 4px;
+}
+
 /* ---------- Glossary ---------- */
 .terms {
   width: 100%;
@@ -894,6 +922,23 @@ form.inline {
     padding-top: 6px;
   }
 }
+.term-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  align-items: center;
+  justify-content: flex-end;
+}
+.term-actions details[open] {
+  order: 2;
+  flex: 1 1 100%;
+  text-align: left;
+}
+@media (max-width: 720px) {
+  .term-actions {
+    justify-content: flex-start;
+  }
+}
 details.edit summary {
   cursor: pointer;
   color: var(--blue);
@@ -901,8 +946,7 @@ details.edit summary {
   list-style: none;
   display: inline;
 }
-details.edit[open] {
-  display: block;
+details.edit[open] .term-form {
   margin-top: 8px;
 }
 
@@ -921,8 +965,19 @@ details.edit[open] {
     padding: 16px 16px 48px;
   }
   .bar {
-    padding: 10px 16px;
-    gap: 8px;
+    padding: 8px 16px;
+    gap: 4px 8px;
+    flex-wrap: wrap;
+  }
+  /* Brand and language on the first line, the navigation below. */
+  .nav {
+    order: 3;
+    flex: 1 1 100%;
+    margin-left: -8px;
+    flex-wrap: wrap;
+  }
+  .header-lang {
+    margin-left: auto;
   }
   .brand small,
   .nav .who {
@@ -937,5 +992,11 @@ details.edit[open] {
   }
   .repo-actions {
     margin-left: 0;
+  }
+  .footer-inner .spacer {
+    display: none;
+  }
+  .footer-inner > span:first-child {
+    flex: 1 1 100%;
   }
 }

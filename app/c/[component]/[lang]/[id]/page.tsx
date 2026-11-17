@@ -34,6 +34,8 @@ export default async function EntryPage({ params, searchParams }: Props) {
   const keyContext = c.format === "flat-json" && s.key.includes("||") ? s.key.slice(s.key.indexOf("||") + 2) : "";
   const next = nextOpen(c.id, lang, s.position);
   const note = languageNote(lang);
+  // Long texts (store descriptions): reference and current translation folded, so the field stays in reach.
+  const long = s.source.length > 400;
   const statusLabel = { done: t("fertig", "done"), outdated: t("veraltet", "outdated"), missing: t("fehlt", "missing") }[detail.status];
   return (
     <>
@@ -65,15 +67,34 @@ export default async function EntryPage({ params, searchParams }: Props) {
                 {s.source}
               </p>
             </div>
-            {s.de_reference && (
-              <div>
-                <div className="field-label">{t("Deutsch (Referenz)", "German (reference)")}</div>
-                <p className="text reference-text" lang="de">
-                  {s.de_reference}
+            {s.de_reference &&
+              (long ? (
+                <details className="fold">
+                  <summary className="field-label">{t("Deutsch (Referenz)", "German (reference)")}</summary>
+                  <p className="text reference-text" lang="de">
+                    {s.de_reference}
+                  </p>
+                </details>
+              ) : (
+                <div>
+                  <div className="field-label">{t("Deutsch (Referenz)", "German (reference)")}</div>
+                  <p className="text reference-text" lang="de">
+                    {s.de_reference}
+                  </p>
+                </div>
+              ))}
+            {detail.current && long && (
+              <details className="fold">
+                <summary className="field-label">
+                  {t("Aktuelle Übersetzung", "Current translation")}
+                  {detail.status === "outdated" && <span className="badge outdated">{t("veraltet", "outdated")}</span>}
+                </summary>
+                <p className="text" lang={lang}>
+                  {detail.current.text}
                 </p>
-              </div>
+              </details>
             )}
-            {detail.current && (
+            {detail.current && !long && (
               <div>
                 <div className="field-label">
                   {t("Aktuelle Übersetzung", "Current translation")}
@@ -101,6 +122,7 @@ export default async function EntryPage({ params, searchParams }: Props) {
             glossary={detail.allGlossary}
             role={user?.role ?? null}
             listState={listState}
+            saved={typeof sp.saved === "string" && ["suggested", "accepted", "confirmed", "unchanged"].includes(sp.saved) ? sp.saved : undefined}
           />
         </div>
         <aside className="stack">

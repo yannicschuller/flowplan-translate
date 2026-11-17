@@ -2,7 +2,7 @@
   "name": "flowplan-translate",
   "version": "0.1.0",
   "private": true,
-  "description": "Translate Flowplan in the browser – reviewed translations go back to the repositories as pull requests.",
+  "description": "Translate Flowplan in the browser \u2013 reviewed translations go back to the repositories as pull requests.",
   "license": "AGPL-3.0-only",
   "homepage": "https://translate.flowplan.org",
   "repository": {

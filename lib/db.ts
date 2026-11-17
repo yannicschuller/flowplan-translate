@@ -167,8 +167,13 @@ export function closeDb() {
   holder.translateDb = undefined;
 }
 
-export const all = <T>(sql: string, ...params: SQLInputValue[]) => db().prepare(sql).all(...params) as T[];
-export const one = <T>(sql: string, ...params: SQLInputValue[]) => db().prepare(sql).get(...params) as T | undefined;
+// Rows as plain objects (node:sqlite gives null-prototype ones, which React
+// cannot hand to client components).
+export const all = <T>(sql: string, ...params: SQLInputValue[]) => db().prepare(sql).all(...params).map((row) => ({ ...row })) as T[];
+export const one = <T>(sql: string, ...params: SQLInputValue[]) => {
+  const row = db().prepare(sql).get(...params);
+  return (row ? { ...row } : undefined) as T | undefined;
+};
 export const run = (sql: string, ...params: SQLInputValue[]) => db().prepare(sql).run(...params);
 let depth = 0;
 // Nested calls join the outer transaction.

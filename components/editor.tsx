@@ -27,6 +27,8 @@ export type EditorProps = {
   glossary: GlossaryEntry[];
   role: "reviewer" | "translator" | null;
   listState: ListState;
+  // What happened to the previous text ("save and next").
+  saved?: string;
 };
 
 type Message = { kind: "ok" | "err"; text: string; issues?: Issue[] };
@@ -37,6 +39,14 @@ export function Editor(props: EditorProps) {
   const [text, setText] = useState(props.initial);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<Message | null>(null);
+  const savedText = (outcome: string) =>
+    outcome === "suggested"
+      ? t("Vorschlag gespeichert – danke! Hier ist der nächste offene Text.", "Suggestion saved – thank you! Here is the next open text.")
+      : outcome === "unchanged"
+        ? t("Unverändert.", "Unchanged.")
+        : outcome === "confirmed"
+          ? t("Bestätigt.", "Confirmed.")
+          : t("Übersetzung akzeptiert.", "Translation accepted.");
   const area = useRef<HTMLTextAreaElement>(null);
   const signedIn = props.role !== null;
   const reviewer = props.role === "reviewer";
@@ -46,10 +56,13 @@ export function Editor(props: EditorProps) {
     [text, props.source, props.format, props.limit, props.placeholders, props.glossary],
   );
 
+  // To the next open text, saying on it what happened to this one.
   const go = useCallback(
-    (next: number | null) => {
-      if (next && next !== props.stringId) router.push(listHref(props.componentId, props.lang, props.listState, next));
-      else router.refresh();
+    (next: number | null, outcome: string) => {
+      if (next && next !== props.stringId) {
+        const href = listHref(props.componentId, props.lang, props.listState, next);
+        router.push(`${href}${href.includes("?") ? "&" : "?"}saved=${encodeURIComponent(outcome)}`);
+      } else router.refresh();
     },
     [router, props.componentId, props.lang, props.listState, props.stringId],
   );
@@ -96,18 +109,8 @@ export function Editor(props: EditorProps) {
     const { ok, data } = await post("/api/translations", { stringId: props.stringId, lang: props.lang, text });
     if (!ok) return;
     const outcome = String(data.outcome);
-    setMessage({
-      kind: "ok",
-      text:
-        outcome === "suggested"
-          ? t("Vorschlag gespeichert – danke!", "Suggestion saved – thank you!")
-          : outcome === "unchanged"
-            ? t("Unverändert.", "Unchanged.")
-            : outcome === "confirmed"
-              ? t("Bestätigt.", "Confirmed.")
-              : t("Übersetzung akzeptiert.", "Translation accepted."),
-    });
-    go((data.next as number | null) ?? null);
+    setMessage({ kind: "ok", text: savedText(outcome) });
+    go((data.next as number | null) ?? null, outcome);
   }, [signedIn, busy, live, post, props.stringId, props.lang, text, t, go]);
 
   useEffect(() => {
@@ -124,15 +127,15 @@ export function Editor(props: EditorProps) {
   // A new entry (after "save and next"): its own text and a clean slate.
   useEffect(() => {
     setText(props.initial);
-    setMessage((m) => (m?.kind === "ok" ? m : null));
+    setMessage(props.saved ? { kind: "ok", text: savedText(props.saved) } : null);
     area.current?.focus();
-  }, [props.stringId, props.initial]);
+  }, [props.stringId, props.initial, props.saved]);
 
   const confirm = async () => {
     const { ok, data } = await post("/api/translations/confirm", { stringId: props.stringId, lang: props.lang });
     if (!ok) return;
     setMessage({ kind: "ok", text: data.outcome === "suggested" ? t("Als Vorschlag gespeichert: noch korrekt.", "Saved as a suggestion: still correct.") : t("Bestätigt.", "Confirmed.") });
-    go((data.next as number | null) ?? null);
+    go((data.next as number | null) ?? null, String(data.outcome));
   };
   const decide = async (id: number, decision: "accept" | "reject") => {
     const { ok } = await post(`/api/suggestions/${id}/${decision}`, {});

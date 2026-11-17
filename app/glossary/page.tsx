@@ -113,6 +113,7 @@ export default async function Glossary({ searchParams }: { searchParams: Promise
                     <td className="muted">{g.note}</td>
                     {reviewer && (
                       <td className="actions">
+                        <div className="term-actions">
                         <details className="edit">
                           <summary>{t("Bearbeiten", "Edit")}</summary>
                           <form method="post" action="/api/glossary" className="term-form">
@@ -135,7 +136,7 @@ export default async function Glossary({ searchParams }: { searchParams: Promise
                               {t("Speichern", "Save")}
                             </button>
                           </form>
-                        </details>{" "}
+                        </details>
                         <form method="post" action="/api/glossary" className="inline">
                           <input type="hidden" name="action" value="delete" />
                           <input type="hidden" name="id" value={g.id} />
@@ -144,6 +145,7 @@ export default async function Glossary({ searchParams }: { searchParams: Promise
                             {t("Löschen", "Delete")}
                           </button>
                         </form>
+                        </div>
                       </td>
                     )}
                   </tr>
