@@ -73,7 +73,8 @@ export default async function Overview({ searchParams }: { searchParams: Promise
                     <form method="post" action="/api/export">
                       <input type="hidden" name="repo" value={repo} />
                       <input type="hidden" name="next" value={here} />
-                      <button className="button small primary" type="submit" disabled={!pending}>
+                      {/* Never disabled: a pull request closed on GitHub sends its texts again, which the count does not know yet. */}
+                      <button className="button small primary" type="submit">
                         {open ? t(`Pull Request aktualisieren (${n(pending)})`, `Update pull request (${n(pending)})`) : t(`Pull Request erstellen (${n(pending)})`, `Create pull request (${n(pending)})`)}
                       </button>
                     </form>
