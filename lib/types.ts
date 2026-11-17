@@ -15,7 +15,16 @@ export type PlaceholderStyle = (typeof PLACEHOLDER_STYLES)[number];
 export const TARGET_LANGS = ["fr", "zh"] as const;
 export type TargetLang = (typeof TARGET_LANGS)[number];
 export const isTargetLang = (v: unknown): v is TargetLang => v === "fr" || v === "zh";
-export const LANG_NAMES: Record<TargetLang, { de: string; en: string; native: string }> = {
+// English (the source) and German (the reference) are shown read-only as
+// "Original" languages: browsable and searchable, never written.
+export const ORIGINAL_LANGS = ["en", "de"] as const;
+export type OriginalLang = (typeof ORIGINAL_LANGS)[number];
+export const isOriginalLang = (v: unknown): v is OriginalLang => v === "en" || v === "de";
+export type ViewLang = TargetLang | OriginalLang;
+export const isViewLang = (v: unknown): v is ViewLang => isTargetLang(v) || isOriginalLang(v);
+export const LANG_NAMES: Record<ViewLang, { de: string; en: string; native: string }> = {
+  en: { de: "Englisch", en: "English", native: "English" },
+  de: { de: "Deutsch", en: "German", native: "Deutsch" },
   fr: { de: "Französisch", en: "French", native: "Français" },
   zh: { de: "Chinesisch (vereinfacht)", en: "Chinese (Simplified)", native: "简体中文" },
 };

@@ -4,10 +4,11 @@ import { notFound } from "next/navigation";
 import { pageT, pageUser } from "@/lib/page";
 import { component } from "@/lib/components";
 import { counts, isFilter, listEntries, type Filter } from "@/lib/store";
-import { isTargetLang, LANG_NAMES } from "@/lib/types";
+import { isOriginalLang, isTargetLang, isViewLang, LANG_NAMES } from "@/lib/types";
 import { formatNumber } from "@/lib/i18n";
 import { listHref } from "@/lib/list-href";
 import { ProgressBar } from "@/components/progress-bar";
+import { OriginalList } from "@/components/original-list";
 
 export const dynamic = "force-dynamic";
 type Props = { params: Promise<{ component: string; lang: string }>; searchParams: Promise<Record<string, string | string[] | undefined>> };
@@ -15,12 +16,16 @@ type Props = { params: Promise<{ component: string; lang: string }>; searchParam
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { component: id, lang } = await params;
   const c = component(id);
-  return { title: c && isTargetLang(lang) ? `${c.title} · ${LANG_NAMES[lang].native}` : undefined };
+  return { title: c && isViewLang(lang) ? `${c.title} · ${LANG_NAMES[lang].native}` : undefined };
 }
 
 export default async function List({ params, searchParams }: Props) {
   const [{ component: id, lang }, sp, { t, locale }, user] = await Promise.all([params, searchParams, pageT(), pageUser()]);
   const c = component(id);
+  if (c && isOriginalLang(lang)) {
+    const q = typeof sp.q === "string" ? sp.q.slice(0, 200) : "";
+    return <OriginalList c={c} lang={lang} q={q} page={Number(typeof sp.page === "string" ? sp.page : 1) || 1} t={t} locale={locale} />;
+  }
   if (!c || !isTargetLang(lang) || !c.targets.includes(lang)) notFound();
   const filterParam = typeof sp.filter === "string" ? sp.filter : "missing";
   const filter: Filter = isFilter(filterParam) && filterParam !== "open" ? filterParam : "missing";

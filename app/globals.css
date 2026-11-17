@@ -449,6 +449,11 @@ form.inline {
   color: var(--err);
   border-color: transparent;
 }
+.badge.original {
+  background: var(--blue-light);
+  color: var(--accent-strong);
+  border-color: transparent;
+}
 .badge.role {
   background: var(--blue-light);
   color: var(--blue);
@@ -606,6 +611,9 @@ form.inline {
     content: attr(data-label) " ";
     color: var(--muted);
   }
+  .progress-table .num.na {
+    display: none;
+  }
 }
 
 /* ---------- List ---------- */
@@ -713,6 +721,19 @@ form.inline {
   .search {
     max-width: none;
     margin-left: 0;
+  }
+}
+/* Originals: English and German side by side, no status column. */
+.entry.original {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+@media (max-width: 720px) {
+  .entry.original {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .entry.original .source,
+  .entry.original .target {
+    grid-column: 1 / -1;
   }
 }
 .pager {

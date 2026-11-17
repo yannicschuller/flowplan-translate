@@ -133,3 +133,10 @@ test("keys missing in the target file are skipped and reported, never added", as
   assert.equal(written[kept], `${entryDetail(id(kept), "fr")!.string.source} (fr)`);
   assert.match(repo.pulls.get(pr.number)!.body, /Not included \(1\)/);
 });
+
+test("a repository without the App's installation: a readable sync error, other repositories still sync", async () => {
+  const desktop = await syncRepo("yannicschuller/flowplan-desktop");
+  assert.deepEqual(desktop.errors.map((e) => [e.code, e.message]), [["app_not_installed", "The GitHub App is not installed on yannicschuller/flowplan-desktop."]]);
+  const web = await syncRepo(REPO);
+  assert.deepEqual(web.errors, []);
+});

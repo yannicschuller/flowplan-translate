@@ -2,6 +2,7 @@
 // tests can set them before the first use. Secrets come only from here.
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { DEFAULT_TIME_ZONE } from "./i18n";
 
 const text = (name: string) => (process.env[name] || "").trim();
 
@@ -39,7 +40,25 @@ export const config = {
     return appId && privateKey ? { appId, privateKey } : null;
   },
   webhookSecret: () => text("TRANSLATE_WEBHOOK_SECRET"),
+  // IANA time zone for dates and times on the pages (default Europe/Berlin).
+  timeZone: () => validTimeZone(text("TRANSLATE_TIME_ZONE")),
 };
+
+// Checked once per value; an unknown zone falls back to Europe/Berlin with a log line.
+const checkedZones = new Map<string, string>();
+export function validTimeZone(value: string): string {
+  if (!value) return DEFAULT_TIME_ZONE;
+  let zone = checkedZones.get(value);
+  if (zone) return zone;
+  try {
+    zone = new Intl.DateTimeFormat("en", { timeZone: value }).resolvedOptions().timeZone;
+  } catch {
+    console.error(`TRANSLATE_TIME_ZONE "${value}" is not a known IANA time zone – using ${DEFAULT_TIME_ZONE}.`);
+    zone = DEFAULT_TIME_ZONE;
+  }
+  checkedZones.set(value, zone);
+  return zone;
+}
 
 // The App's private key: PEM in TRANSLATE_GITHUB_PRIVATE_KEY (real line
 // breaks or "\n"-escaped on one line), or a file in TRANSLATE_GITHUB_PRIVATE_KEY_FILE.

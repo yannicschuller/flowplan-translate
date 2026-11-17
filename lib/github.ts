@@ -5,7 +5,8 @@ import { createSign } from "node:crypto";
 import { config } from "./config";
 
 export class GitHubError extends Error {
-  constructor(public status: number, public path: string, message: string) {
+  // code: "app_not_installed" when the App has no installation on the repository.
+  constructor(public status: number, public path: string, message: string, public code = "") {
     super(message);
   }
 }
@@ -70,7 +71,14 @@ export async function installationToken(repo: string): Promise<string> {
   const cached = cache.get(`${config.githubApi()} ${repo}`);
   if (cached && cached.expires - 5 * 60_000 > Date.now()) return cached.token;
   const jwt = appJwt(app.appId, app.privateKey);
-  const installation = await call<{ id: number }>(jwt, "GET", `/repos/${repo}/installation`);
+  let installation: { id: number };
+  try {
+    installation = await call<{ id: number }>(jwt, "GET", `/repos/${repo}/installation`);
+  } catch (error) {
+    if (error instanceof GitHubError && error.status === 404)
+      throw new GitHubError(404, error.path, `The GitHub App is not installed on ${repo}.`, "app_not_installed");
+    throw error;
+  }
   const access = await call<{ token: string; expires_at: string }>(jwt, "POST", `/app/installations/${installation.id}/access_tokens`, {});
   cache.set(`${config.githubApi()} ${repo}`, { token: access.token, expires: Date.parse(access.expires_at) || Date.now() + 30 * 60_000 });
   return access.token;

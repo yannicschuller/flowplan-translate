@@ -62,5 +62,12 @@ test("translate, see the placeholder check block, fix it, accept as reviewer", a
   // The overview now offers a pull request for the accepted text.
   await review.goto("/");
   await expect(review.getByRole("button", { name: /Create pull request \(1\)/ })).toBeEnabled();
+  // The originals: German is browsable and read-only, a text without German says so.
+  await review.goto("/c/flowplan-web/de?q=checked");
+  await expect(review.getByRole("heading", { level: 1 })).toContainText("Deutsch");
+  await review.locator(".entry").filter({ hasText: "checked||health" }).click();
+  await expect(review).toHaveURL(/\/c\/flowplan-web\/de\/\d+/);
+  await expect(review.getByText("this text has no German version", { exact: false })).toBeVisible();
+  await expect(review.getByRole("textbox")).toHaveCount(0);
   await r.close();
 });

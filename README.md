@@ -91,6 +91,7 @@ Per language: term → translation, with a note, plus one note per language (Fre
 | `TRANSLATE_GITHUB_PRIVATE_KEY` | yes¹ | The App's private key (PEM); a single line with `\n` escapes works too. |
 | `TRANSLATE_GITHUB_PRIVATE_KEY_FILE` | yes¹ | Instead: path to the `.pem` file. |
 | `TRANSLATE_WEBHOOK_SECRET` | yes | The App's webhook secret. Without it the webhook answers 503. |
+| `TRANSLATE_TIME_ZONE` | – | IANA time zone for dates and times on the pages (default `Europe/Berlin`; an unknown name falls back to it with a log line). |
 | `PORT` | – | Port of the server (default 3000). |
 | `TRANSLATE_GITHUB_API` | – | Tests only: base URL of a GitHub API mock (the OAuth code exchange goes there too). |
 | `TRANSLATE_COMPONENTS_FILE` | – | Another `components.json` (tests); default `components.json` in the working directory. |

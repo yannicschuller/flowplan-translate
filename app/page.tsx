@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { pageT, pageUser } from "@/lib/page";
 import { componentsOf, repos } from "@/lib/components";
-import { counts } from "@/lib/store";
+import { counts, originalCounts } from "@/lib/store";
 import { syncState } from "@/lib/sync";
 import { pendingCount, trackedPull } from "@/lib/export";
 import { formatDateTime, formatNumber } from "@/lib/i18n";
-import { LANG_NAMES } from "@/lib/types";
+import { LANG_NAMES, ORIGINAL_LANGS } from "@/lib/types";
 import { errorMessage } from "@/lib/notices";
+import { config } from "@/lib/config";
 import { ProgressBar } from "@/components/progress-bar";
 
 export const dynamic = "force-dynamic";
@@ -51,7 +52,7 @@ export default async function Overview({ searchParams }: { searchParams: Promise
                   </h2>
                   <p className="repo-meta">
                     {state.synced_at
-                      ? t(`Synchronisiert ${formatDateTime(locale, state.synced_at)}`, `Synced ${formatDateTime(locale, state.synced_at)}`) + (state.sha ? ` · ${state.sha.slice(0, 7)}` : "")
+                      ? t(`Synchronisiert ${formatDateTime(locale, state.synced_at, config.timeZone())}`, `Synced ${formatDateTime(locale, state.synced_at, config.timeZone())}`) + (state.sha ? ` · ${state.sha.slice(0, 7)}` : "")
                       : t("Noch nicht synchronisiert", "Not synced yet")}
                     {open && (
                       <>
@@ -86,7 +87,7 @@ export default async function Overview({ searchParams }: { searchParams: Promise
                   {state.errors.map((e, i) => (
                     <li key={i}>
                       {e.component ? `${e.component}: ` : ""}
-                      {e.message}
+                      {e.code === "app_not_installed" ? errorMessage(e.code, t, repo) : e.message}
                     </li>
                   ))}
                 </ul>
@@ -119,8 +120,47 @@ export default async function Overview({ searchParams }: { searchParams: Promise
                   </tr>
                 </thead>
                 <tbody>
-                  {componentsOf(repo).flatMap((c) =>
-                    c.targets.map((lang) => {
+                  {componentsOf(repo).flatMap((c) => [
+                    // The originals first: read-only, always complete.
+                    ...ORIGINAL_LANGS.map((lang) => {
+                      const o = originalCounts(c.id);
+                      const href = `/c/${c.id}/${lang}`;
+                      const name = locale === "de" ? LANG_NAMES[lang].de : LANG_NAMES[lang].en;
+                      const onlyInCode = o.total - o.german;
+                      return (
+                        <tr key={`${c.id}-${lang}`} className="original-row">
+                          <td className="component-cell">
+                            <Link href={href}>{c.title}</Link>
+                          </td>
+                          <td className="lang">
+                            <Link href={href} lang={lang}>
+                              {LANG_NAMES[lang].native}
+                            </Link>
+                            <span className="visually-hidden"> ({name})</span>
+                          </td>
+                          <td className="progress-cell">
+                            {o.total ? (
+                              <span className="row">
+                                <span className="badge original">{lang === "en" ? t("Original · Ausgangstext", "Original · source") : t("Original", "Original")}</span>
+                                {lang === "de" && onlyInCode > 0 && <span className="muted small">{t(`${n(onlyInCode)} nur im Code`, `${n(onlyInCode)} only in the code`)}</span>}
+                              </span>
+                            ) : (
+                              <span className="muted small">{t("Noch keine Texte", "No texts yet")}</span>
+                            )}
+                          </td>
+                          <td className="num" data-label={t("Texte", "Texts")}>
+                            {n(lang === "en" ? o.total : o.german)}
+                          </td>
+                          <td className="num na" data-label={t("Veraltet", "Outdated")}>
+                            –
+                          </td>
+                          <td className="num na" data-label={t("Fehlt", "Missing")}>
+                            –
+                          </td>
+                        </tr>
+                      );
+                    }),
+                    ...c.targets.map((lang) => {
                       const k = counts(c.id, lang);
                       const href = `/c/${c.id}/${lang}`;
                       const name = locale === "de" ? LANG_NAMES[lang].de : LANG_NAMES[lang].en;
@@ -154,7 +194,7 @@ export default async function Overview({ searchParams }: { searchParams: Promise
                         </tr>
                       );
                     }),
-                  )}
+                  ])}
                 </tbody>
               </table>
             </section>

@@ -14,7 +14,8 @@ import { allPaths, catalogueFile, componentsOf, txtFiles } from "./components";
 import { repoClient, GitHubError } from "./github";
 import type { Component } from "./types";
 
-export type SyncProblem = { component: string | null; message: string };
+// code "app_not_installed": shown as a readable sentence on the overview.
+export type SyncProblem = { component: string | null; message: string; code?: string };
 export type ImportResult = { errors: SyncProblem[]; notes: SyncProblem[]; added: number; changed: number; removed: number; imported: number };
 
 type SourceEntry = { key: string; text: string; file: string };
@@ -250,7 +251,7 @@ export async function syncRepo(repo: string): Promise<SyncState> {
     }
   } catch (error) {
     if (!(error instanceof GitHubError)) console.error(error);
-    errors.push({ component: null, message: (error as Error).message });
+    errors.push({ component: null, message: (error as Error).message, ...(error instanceof GitHubError && error.code ? { code: error.code } : {}) });
   }
   saveState(repo, sha, errors, notes, at);
   return syncState(repo);

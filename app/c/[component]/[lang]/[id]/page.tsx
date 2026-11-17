@@ -2,11 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { pageT, pageUser } from "@/lib/page";
-import { entryDetail, isFilter, nextOpen } from "@/lib/store";
-import { isTargetLang, LANG_NAMES } from "@/lib/types";
+import { entryDetail, isFilter, nextOpen, originalDetail } from "@/lib/store";
+import { isOriginalLang, isTargetLang, LANG_NAMES } from "@/lib/types";
 import { listHref } from "@/lib/list-href";
 import { languageNote } from "@/lib/glossary";
 import { Editor } from "@/components/editor";
+import { OriginalEntry } from "@/components/original-entry";
 
 export const dynamic = "force-dynamic";
 type Props = { params: Promise<{ component: string; lang: string; id: string }>; searchParams: Promise<Record<string, string | string[] | undefined>> };
@@ -19,13 +20,25 @@ async function load(params: Props["params"]) {
   return detail;
 }
 
+async function loadOriginal(params: Props["params"]) {
+  const { component: componentId, lang, id } = await params;
+  if (!isOriginalLang(lang) || !/^\d{1,12}$/.test(id)) return null;
+  const detail = originalDetail(Number(id));
+  if (!detail || detail.component.id !== componentId) return null;
+  return { detail, lang };
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const original = await loadOriginal(params);
+  if (original) return { title: `${original.detail.string.key.slice(0, 60)} · ${LANG_NAMES[original.lang].native}` };
   const detail = await load(params);
   return { title: detail ? `${detail.string.key.slice(0, 60)} · ${LANG_NAMES[detail.lang].native}` : undefined };
 }
 
 export default async function EntryPage({ params, searchParams }: Props) {
-  const [detail, sp, { t }, user] = await Promise.all([load(params), searchParams, pageT(), pageUser()]);
+  const [detail, original, sp, { t }, user] = await Promise.all([load(params), loadOriginal(params), searchParams, pageT(), pageUser()]);
+  if (original)
+    return <OriginalEntry detail={original.detail} lang={original.lang} q={typeof sp.q === "string" ? sp.q.slice(0, 200) : ""} page={Number(sp.page) || 1} t={t} />;
   if (!detail) notFound();
   const { string: s, component: c, lang } = detail;
   const filter = typeof sp.filter === "string" && isFilter(sp.filter) ? sp.filter : "missing";

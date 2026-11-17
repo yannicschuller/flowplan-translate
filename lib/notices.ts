@@ -1,8 +1,12 @@
 // The result of a form action (?error=…, ?synced=…, ?pr=…) as a sentence.
 import type { T } from "./i18n";
 
-export function errorMessage(code: string, t: T): string {
+export function errorMessage(code: string, t: T, repo = ""): string {
   switch (code) {
+    case "app_not_installed":
+      return repo
+        ? t(`Die GitHub App ist auf ${repo} nicht installiert.`, `The GitHub App is not installed on ${repo}.`)
+        : t("Die GitHub App ist auf diesem Repository nicht installiert.", "The GitHub App is not installed on this repository.");
     case "nothing_to_export":
       return t("Nichts Neues zu exportieren: Alle akzeptierten Übersetzungen sind schon in main oder im offenen Pull Request.", "Nothing new to export: every accepted translation is already in main or in the open pull request.");
     case "github_failed":

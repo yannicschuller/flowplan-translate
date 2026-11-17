@@ -36,10 +36,13 @@ export const switchLanguageHref = (locale: Locale, back: string) => `/lang/${loc
 export type T = (de: string, en: string) => string;
 export const translate = (locale: Locale): T => (de, en) => (locale === "de" ? de : en);
 
-export function formatDate(locale: Locale, at: number) {
-  return new Intl.DateTimeFormat(locale === "de" ? "de-DE" : "en-GB", { day: "numeric", month: "short", year: "numeric" }).format(at);
+// Dates and times in the configured time zone (TRANSLATE_TIME_ZONE, see
+// lib/config.ts; the server passes it – a container runs in UTC otherwise).
+export const DEFAULT_TIME_ZONE = "Europe/Berlin";
+export function formatDate(locale: Locale, at: number, timeZone = DEFAULT_TIME_ZONE) {
+  return new Intl.DateTimeFormat(locale === "de" ? "de-DE" : "en-GB", { day: "numeric", month: "short", year: "numeric", timeZone }).format(at);
 }
-export function formatDateTime(locale: Locale, at: number) {
-  return new Intl.DateTimeFormat(locale === "de" ? "de-DE" : "en-GB", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }).format(at);
+export function formatDateTime(locale: Locale, at: number, timeZone = DEFAULT_TIME_ZONE) {
+  return new Intl.DateTimeFormat(locale === "de" ? "de-DE" : "en-GB", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", timeZone }).format(at);
 }
 export const formatNumber = (locale: Locale, n: number) => new Intl.NumberFormat(locale === "de" ? "de-DE" : "en-GB").format(n);

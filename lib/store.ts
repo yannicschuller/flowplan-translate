@@ -279,3 +279,52 @@ export function rejectSuggestion(user: SessionUser, translationId: number, at = 
   return { stringId: s.id, lang: t.lang };
 }
 
+
+// ---- The originals: English (source) and German (reference), read-only ----
+
+// Every text has its English source; German exists where the reference file
+// has one ("" there: the text has no German counterpart, it is only in the code).
+export function originalCounts(componentId: string) {
+  const row = one<{ total: number; german: number }>(
+    "SELECT COUNT(*) AS total, COALESCE(SUM(de_reference != ''), 0) AS german FROM strings WHERE component_id=? AND removed=0",
+    componentId,
+  )!;
+  return { total: Number(row.total), german: Number(row.german) };
+}
+
+export type OriginalRow = { id: number; key: string; source: string; german: string };
+
+export function listOriginals(input: { componentId: string; q?: string; page?: number }) {
+  const where = ["component_id=?", "removed=0"];
+  const params: SQLInputValue[] = [input.componentId];
+  const q = (input.q || "").trim().slice(0, 200);
+  if (q) {
+    where.push("(key LIKE ? ESCAPE '\\' OR source LIKE ? ESCAPE '\\' OR de_reference LIKE ? ESCAPE '\\')");
+    params.push(likeEscape(q), likeEscape(q), likeEscape(q));
+  }
+  const from = `FROM strings WHERE ${where.join(" AND ")}`;
+  const total = Number(one<{ n: number }>(`SELECT COUNT(*) AS n ${from}`, ...params)!.n);
+  const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const page = Math.min(Math.max(1, Math.floor(input.page || 1)), pages);
+  const rows = all<{ id: number; key: string; source: string; de_reference: string }>(
+    `SELECT id,key,source,de_reference ${from} ORDER BY position LIMIT ? OFFSET ?`,
+    ...params,
+    PAGE_SIZE,
+    (page - 1) * PAGE_SIZE,
+  );
+  return { total, page, pages, rows: rows.map((r): OriginalRow => ({ id: r.id, key: r.key, source: r.source, german: r.de_reference })) };
+}
+
+// One text read-only: key, English, German, context and the glossary terms
+// it contains (per target language).
+export function originalDetail(stringId: number) {
+  const s = getString(stringId);
+  if (!s || s.removed) return null;
+  const c = component(s.component_id);
+  if (!c) return null;
+  return {
+    string: s,
+    component: c,
+    glossary: c.targets.map((lang) => ({ lang, hits: glossaryHits(s.source, glossary(lang)) })),
+  };
+}

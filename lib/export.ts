@@ -116,6 +116,7 @@ export async function createPullRequest(user: SessionUser, repo: string, at = no
   try {
     client = await repoClient(repo);
   } catch (error) {
+    if (error instanceof GitHubError && error.code === "app_not_installed") throw new HttpError(502, "app_not_installed", error.message);
     throw new HttpError(502, "github_failed", (error as Error).message);
   }
   try {
