@@ -1127,3 +1127,47 @@ details.edit[open] .term-form {
     flex: 1 1 100%;
   }
 }
+
+/* ---------- Guidelines ---------- */
+.guide ul {
+  margin: 0;
+  padding-left: 20px;
+  display: grid;
+  gap: 8px;
+  line-height: 1.55;
+}
+.guide h2 .muted {
+  font-weight: 400;
+}
+.guide-example {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 4px 14px;
+  margin: 8px 0 0;
+  padding: 10px 14px;
+  background: var(--surface);
+  border-radius: 8px;
+  font-size: 14px;
+}
+.guide-example dt {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  padding-top: 2px;
+}
+.guide-example dt.bad,
+.guide-example dt.bad + dd {
+  color: var(--err);
+}
+.guide-example dd {
+  margin: 0;
+}
+
+/* Editor: what the source is the truth for, and the fragment notice. */
+.truth-note {
+  margin: 0;
+}
+.fragment-note {
+  margin: 6px 0 0;
+  color: var(--warn);
+}

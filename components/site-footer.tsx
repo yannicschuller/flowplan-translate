@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { pageT } from "@/lib/page";
 
 export async function SiteFooter() {
@@ -9,6 +10,7 @@ export async function SiteFooter() {
       <div className="footer-inner">
         <span>{t("Übersetzungen für Flowplan – keine Tracker, keine Werbung.", "Translations for Flowplan – no trackers, no ads.")}</span>
         <span className="spacer" />
+        <Link href="/guide">{t("Leitfaden fürs Übersetzen", "Translation guidelines")}</Link>
         <a href="https://flowplan.org">flowplan.org</a>
         <a href="https://github.com/yannicschuller/flowplan-translate">{t("Quellcode", "Source code")}</a>
         <a href={`${site}/impressum`}>{t("Impressum", "Legal notice")}</a>

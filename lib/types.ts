@@ -81,6 +81,8 @@ export type IssueCode =
   | "edge_whitespace_txt"
   | "whitespace_differs"
   | "punctuation_differs"
+  | "case_differs"
+  | "leading_mark_differs"
   | "glossary_unused";
 
 export type Issue = { code: IssueCode; values?: string[]; limit?: number; actual?: number };

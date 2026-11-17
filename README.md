@@ -43,11 +43,15 @@ Reading (overview, lists, editor, glossary) needs no account.
 On every save (in the browser while typing, and again on the server):
 
 - **Blocking**: the same placeholders as the source (as a multiset, order may change), not empty, length limits, single-line fields without line breaks, no control characters, txt fields without leading/trailing blanks or extra lines, App Store keywords (comma-separated, no spaces around commas, no repeats), at most 10,000 characters.
-- **Hints** (saving allowed): leading/trailing whitespace differs from the source, final punctuation differs (full-width and French forms count as the same), a glossary term in the source whose glossary translation is not used.
+- **Hints** (saving allowed): leading/trailing whitespace differs from the source, final punctuation differs (full-width and French forms count as the same), the first letter's case differs (names like `iCloud` and scripts without case are skipped), the leading mark (`·`, `–`, …) differs, a glossary term in the source whose glossary translation is not used.
 
 In the editor, placeholders in the English source and the German reference appear as chips. Below the field there is one button per placeholder of the source: it inserts the placeholder at the caret and shows whether the translation already uses it as often as the source does. A live preview fills in sample values, which you can edit in the browser (they are never saved), for both the translation and the source.
 
 Translations are always shown as text, never as HTML.
+
+### Guidelines
+
+`/guide` (linked in the header, the footer and on the overview) holds the rules for translators: English is the source of truth for meaning, casing, punctuation, edge spaces and symbols; German is a reference for the meaning only. Plus placeholders, names and keys, length, and the rules for French ("vous", French typography, platform terms) and Simplified Chinese (full-width punctuation, spacing, platform terms). The editor repeats the first rule under the reference and, when the source is a fragment (lowercase start, a mark or space at the start or end – `lib/fragment.ts`), says what to keep.
 
 ### Originals
 

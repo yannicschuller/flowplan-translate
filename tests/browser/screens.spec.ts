@@ -25,6 +25,7 @@ test("main pages at desktop and phone width, light and dark, de and en", async (
     { name: "list-de", path: "/c/flowplan-web/de", signedIn: true },
     { name: "original-entry", path: "/c/flowplan-web/de?q=checked", signedIn: true, first: "checked" },
     { name: "glossary", path: "/glossary?lang=fr", signedIn: true },
+    { name: "guide", path: "/guide", signedIn: false },
     { name: "signin", path: "/login", signedIn: false },
   ];
   const overflow: string[] = [];

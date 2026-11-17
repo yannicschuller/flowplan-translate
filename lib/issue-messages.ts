@@ -34,6 +34,16 @@ export function issueMessage(issue: Issue, t: T): string {
       return t("Leerzeichen am Anfang oder Ende weichen vom Ausgangstext ab.", "Leading or trailing spaces differ from the source.");
     case "punctuation_differs":
       return t("Das Satzzeichen am Ende weicht vom Ausgangstext ab.", "The final punctuation differs from the source.");
+    case "case_differs":
+      return issue.values?.[0] === "lower"
+        ? t("Der Ausgangstext beginnt klein (ein Satzteil, der an anderen Text anschließt) – beginne auch klein.", "The source starts lowercase (a fragment joined to other text) – start lowercase too.")
+        : t("Der Ausgangstext beginnt mit einem Großbuchstaben – beginne auch mit einem.", "The source starts with a capital letter – start with one too.");
+    case "leading_mark_differs": {
+      const [want, have] = issue.values || [];
+      return want
+        ? t(`Der Ausgangstext beginnt mit „${want}“ – behalte es am Anfang.`, `The source starts with ‘${want}’ – keep it at the start.`)
+        : t(`Der Ausgangstext beginnt nicht mit „${have}“.`, `The source doesn't start with ‘${have}’.`);
+    }
     case "glossary_unused": {
       const [term, translation] = issue.values || [];
       return t(`Glossar: „${term}“ wird hier „${translation}“ übersetzt.`, `Glossary: “${term}” is translated “${translation}” here.`);

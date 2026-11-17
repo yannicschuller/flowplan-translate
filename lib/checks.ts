@@ -2,6 +2,7 @@
 // allowed. Client-safe: the editor runs them while typing, the server runs
 // them again on every save and accept.
 import { comparePlaceholders } from "./placeholders";
+import { initialCase, leadingMark, sameMark } from "./fragment";
 import type { CheckResult, Format, GlossaryEntry, Issue, Limit, PlaceholderStyle } from "./types";
 
 export const MAX_INPUT = 10_000;
@@ -98,6 +99,14 @@ export function checkTranslation(input: CheckInput): CheckResult {
     const trail = (s: string) => /\s*$/.exec(s)![0];
     if (lead(source) !== lead(text) || trail(source) !== trail(text)) hints.push({ code: "whitespace_differs" });
   }
+  // Fragments keep the source's case and leading mark (lib/fragment.ts);
+  // a script without case (Chinese) is never compared.
+  const wantCase = initialCase(source, input.placeholders);
+  const haveCase = initialCase(text, input.placeholders);
+  if (wantCase && haveCase && wantCase !== haveCase) hints.push({ code: "case_differs", values: [wantCase, haveCase] });
+  const wantMark = leadingMark(source, input.placeholders);
+  const haveMark = leadingMark(text, input.placeholders);
+  if ((wantMark || haveMark) && !(wantMark && haveMark && sameMark(wantMark, haveMark))) hints.push({ code: "leading_mark_differs", values: [wantMark, haveMark] });
   const want = finalPunctuation(source);
   const have = finalPunctuation(text);
   if (want !== have) hints.push({ code: "punctuation_differs", values: [want, have] });

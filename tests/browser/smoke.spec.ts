@@ -30,7 +30,11 @@ test("translate, see the placeholder check block, fix it, accept as reviewer", a
   const csp = watchCsp(page);
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "Translate Flowplan" })).toBeVisible();
+  await page.goto("/guide");
+  await expect(page.getByRole("heading", { name: "Translation guidelines" })).toBeVisible();
   await page.goto(url);
+  // English is the source of truth: the hint links to the guidelines.
+  await expect(page.locator(".truth-note a[href='/guide']")).toBeVisible();
   const source = (await page.locator(".source-text").innerText()).trim();
   expect(source).toContain("{0}");
   const field = page.getByRole("textbox", { name: "Your suggestion" });

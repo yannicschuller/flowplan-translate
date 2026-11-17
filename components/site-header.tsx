@@ -21,6 +21,7 @@ export async function SiteHeader() {
         <nav className="nav" aria-label={t("Hauptnavigation", "Main navigation")}>
           <Link href="/">{t("Übersicht", "Overview")}</Link>
           <Link href="/glossary">{t("Glossar", "Glossary")}</Link>
+          <Link href="/guide">{t("Leitfaden", "Guidelines")}</Link>
           {user ? (
             <>
               <span className="who">

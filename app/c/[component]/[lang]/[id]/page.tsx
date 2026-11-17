@@ -6,6 +6,7 @@ import { entryDetail, isFilter, nextOpen, originalDetail } from "@/lib/store";
 import { isOriginalLang, isTargetLang, LANG_NAMES } from "@/lib/types";
 import { listHref } from "@/lib/list-href";
 import { languageNote } from "@/lib/glossary";
+import { fragmentNotice, fragmentOf } from "@/lib/fragment";
 import { Editor } from "@/components/editor";
 import { OriginalEntry } from "@/components/original-entry";
 import { PlaceholderText } from "@/components/placeholder-text";
@@ -50,6 +51,7 @@ export default async function EntryPage({ params, searchParams }: Props) {
   const note = languageNote(lang);
   // Long texts (store descriptions): reference and current translation folded, so the field stays in reach.
   const long = s.source.length > 400;
+  const fragment = fragmentOf(s.source, c.placeholders);
   const statusLabel = { done: t("fertig", "done"), outdated: t("veraltet", "outdated"), missing: t("fehlt", "missing") }[detail.status];
   return (
     <>
@@ -80,6 +82,7 @@ export default async function EntryPage({ params, searchParams }: Props) {
               <p className="text source-text" lang="en">
                 <PlaceholderText text={s.source} styles={c.placeholders} />
               </p>
+              {fragment && <p className="small fragment-note">{fragmentNotice(fragment, t)}</p>}
             </div>
             {s.de_reference &&
               (long ? (
@@ -97,6 +100,10 @@ export default async function EntryPage({ params, searchParams }: Props) {
                   </p>
                 </div>
               ))}
+            <p className="small muted truth-note">
+              {t("Englisch ist maßgeblich – auch für Groß- und Kleinschreibung und Satzzeichen. Deutsch hilft nur beim Sinn.", "English is the source of truth – also for casing and punctuation. German only helps with the meaning.")}{" "}
+              <Link href="/guide">{t("Leitfaden", "Guidelines")}</Link>
+            </p>
             {detail.current && long && (
               <details className="fold">
                 <summary className="field-label">

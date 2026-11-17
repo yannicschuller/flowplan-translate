@@ -30,7 +30,8 @@ export default async function Overview({ searchParams }: { searchParams: Promise
           {t(
             "Wähle einen Bereich und eine Sprache. Deine Vorschläge prüft ein Reviewer; akzeptierte Übersetzungen gehen als Pull Request in das Repository.",
             "Pick a part and a language. A reviewer checks your suggestions; accepted translations go to the repository as a pull request.",
-          )}
+          )}{" "}
+          <Link href="/guide">{t("Lies vorher kurz den Leitfaden.", "Read the guidelines first.")}</Link>
           {!user && (
             <>
               {" "}
