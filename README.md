@@ -26,7 +26,7 @@ The file is read on every start and upserted into the database; a component remo
 Formats:
 
 - **flat-json** – `{ "key": "text" }`. In flowplan's web app the keys are the English text, optionally with a `||context` suffix (`"Open||status"`); `""` means not translated.
-- **nested-json** – objects of objects; the key is the dotted path (`ios.NSCameraUsageDescription`).
+- **nested-json** – objects of objects; the key is the dotted path (`ios.NSCameraUsageDescription`), list items by their index (`landing.hero.facts.0`). The website's catalogues (`locales/site`, `locales/demo` in flowplan-website) are of this kind: its `npm run locales` writes `en.json` and `de.json` from its code and gives new keys to `fr.json` and `zh.json` with the English text.
 - **txt-files** – one plain-text file per field (store listings); trailing newline and line endings are kept.
 
 The writers are format-preserving: a small JSON tokenizer records where each value sits in the original text, and only the values of changed keys are replaced (escaped like `JSON.stringify`, non-ASCII as is). Order, indentation, escapes, line endings and the trailing newline stay as they were – a pull request changes exactly the lines of the changed texts. The tool **never writes the source or reference files and never adds or removes keys**; a key missing in a target file is skipped and listed in the pull request (the repository's own catalogue script, e.g. `npm run i18n` in flowplan, adds keys).
@@ -142,7 +142,7 @@ Create a GitHub App (Settings → Developer settings → GitHub Apps → New):
 4. **Repository permissions**: Contents **read & write**, Pull requests **read & write**, Metadata **read**. No account permissions.
 5. **Subscribe to events**: **Push** and **Pull request** (the latter updates the state of the tool's pull requests at once; without it, the next sync or the overview does it).
 6. Create the App, note the App ID and client id, generate a client secret and a private key.
-7. **Install** the App on the repositories in `components.json` (yannicschuller/flowplan, flowplan-app, flowplan-desktop).
+7. **Install** the App on the repositories in `components.json` (yannicschuller/flowplan, flowplan-app, flowplan-desktop, flowplan-website).
 
 The tool finds the installation per repository (`GET /repos/{owner}/{repo}/installation`) with a JWT signed by the private key and uses short-lived installation tokens; commits and pull requests appear as the App.
 

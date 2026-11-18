@@ -236,6 +236,48 @@
       "placeholders": [
         "index"
       ]
+    },
+    {
+      "id": "flowplan-website",
+      "title": "Website · start and download page",
+      "repo": "yannicschuller/flowplan-website",
+      "format": "nested-json",
+      "source": "en",
+      "reference": "de",
+      "targets": [
+        "fr",
+        "zh"
+      ],
+      "files": {
+        "en": "locales/site/en.json",
+        "de": "locales/site/de.json",
+        "fr": "locales/site/fr.json",
+        "zh": "locales/site/zh.json"
+      },
+      "placeholders": [
+        "brace"
+      ]
+    },
+    {
+      "id": "flowplan-website-demo",
+      "title": "Website · interactive demo",
+      "repo": "yannicschuller/flowplan-website",
+      "format": "nested-json",
+      "source": "en",
+      "reference": "de",
+      "targets": [
+        "fr",
+        "zh"
+      ],
+      "files": {
+        "en": "locales/demo/en.json",
+        "de": "locales/demo/de.json",
+        "fr": "locales/demo/fr.json",
+        "zh": "locales/demo/zh.json"
+      },
+      "placeholders": [
+        "brace"
+      ]
     }
   ]
 }

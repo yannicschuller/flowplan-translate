@@ -20,6 +20,8 @@ test("components.json: every catalogue, valid, targets fr and zh only", () => {
     "flowplan-app-widget-suite",
     "flowplan-app-store",
     "flowplan-desktop",
+    "flowplan-website",
+    "flowplan-website-demo",
   ]);
   for (const c of list) assert.deepEqual(c.targets, ["fr", "zh"]);
   const web = list[0];
@@ -29,6 +31,10 @@ test("components.json: every catalogue, valid, targets fr and zh only", () => {
   assert.equal(txtFiles(store, "zh").get("google-play/title"), "store/google-play/zh-CN/title.txt");
   assert.ok(![...txtFiles(store, "en").values()].some((p) => /release_notes|changelog|url|video/.test(p)), "no release notes, URLs or video");
   assert.deepEqual(store.limits["app-store/keywords"], { bytes: 100, keywords: true });
+  const website = list.find((c) => c.id === "flowplan-website")!;
+  assert.equal(website.repo, "yannicschuller/flowplan-website");
+  assert.equal(website.format, "nested-json");
+  assert.equal((website.files as Record<string, string>).zh, "locales/site/zh.json");
   assert.throws(() => parseComponents('{"components":[{"id":"x","repo":"a/b","format":"po","targets":["fr"],"files":{}}]}'), /format/);
   assert.throws(() => parseComponents('{"components":[{"id":"x","repo":"a/b","format":"flat-json","targets":["de"],"files":{}}]}'), /targets/);
   assert.throws(
