@@ -4,10 +4,22 @@ import { DatabaseSync, type SQLInputValue } from "node:sqlite";
 import { mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { config } from "./config";
-import { GLOSSARY_SEED, LANGUAGE_NOTES_SEED } from "./glossary-seed";
+import { GLOSSARY_SEED, GLOSSARY_SEED_RU, LANGUAGE_NOTES_SEED, LANGUAGE_NOTES_SEED_RU } from "./glossary-seed";
 import { upsertComponents } from "./components";
 
 const sqlString = (s: string) => `'${s.replace(/'/g, "''")}'`;
+
+type SeedTerm = { lang: string; term: string; translation: string; note: string };
+// INSERT OR IGNORE: a term or note a reviewer already added stays as it is.
+function seedSql(terms: SeedTerm[], notes: { lang: string; note: string }[]) {
+  return [
+    ...terms.map(
+      (g) =>
+        `INSERT OR IGNORE INTO glossary(lang,term,translation,note,updated_at) VALUES(${sqlString(g.lang)},${sqlString(g.term)},${sqlString(g.translation)},${sqlString(g.note)},0);`,
+    ),
+    ...notes.map((n) => `INSERT OR IGNORE INTO language_notes(lang,note,updated_at) VALUES(${sqlString(n.lang)},${sqlString(n.note)},0);`),
+  ].join("\n");
+}
 
 const MIGRATIONS: string[] = [
   // 1: accounts, components and their texts, translations, glossary, sync, pull requests, rate limits
@@ -115,15 +127,11 @@ const MIGRATIONS: string[] = [
      count INTEGER NOT NULL
    );`,
   // 2: the glossary's core terms and the per-language notes (lib/glossary-seed.ts)
-  [
-    ...GLOSSARY_SEED.map(
-      (g) =>
-        `INSERT OR IGNORE INTO glossary(lang,term,translation,note,updated_at) VALUES(${sqlString(g.lang)},${sqlString(g.term)},${sqlString(g.translation)},${sqlString(g.note)},0);`,
-    ),
-    ...LANGUAGE_NOTES_SEED.map((n) => `INSERT OR IGNORE INTO language_notes(lang,note,updated_at) VALUES(${sqlString(n.lang)},${sqlString(n.note)},0);`),
-  ].join("\n"),
+  seedSql(GLOSSARY_SEED, LANGUAGE_NOTES_SEED),
   // 3: when the state of a tracked pull request was last checked on GitHub
   `ALTER TABLE pull_requests ADD COLUMN checked_at INTEGER;`,
+  // 4: Russian (ru) – its core glossary terms and its language note
+  seedSql(GLOSSARY_SEED_RU, LANGUAGE_NOTES_SEED_RU),
 ];
 export const SCHEMA_VERSION = MIGRATIONS.length;
 

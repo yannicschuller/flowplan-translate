@@ -9,7 +9,7 @@ import { glossary, languageNote } from "../lib/glossary";
 
 useTempData();
 
-test("components.json: every catalogue, valid, targets fr and zh only", () => {
+test("components.json: every catalogue, valid, Russian only for the web app", () => {
   const list = components();
   assert.deepEqual(list.map((c) => c.id), [
     "flowplan-web",
@@ -23,9 +23,11 @@ test("components.json: every catalogue, valid, targets fr and zh only", () => {
     "flowplan-website",
     "flowplan-website-demo",
   ]);
-  for (const c of list) assert.deepEqual(c.targets, ["fr", "zh"]);
   const web = list[0];
+  assert.deepEqual(web.targets, ["fr", "zh", "ru"]);
+  for (const c of list.slice(1)) assert.deepEqual(c.targets, ["fr", "zh"], c.id);
   assert.equal((web.files as Record<string, string>).de, "locales/reference/de.json");
+  assert.equal((web.files as Record<string, string>).ru, "locales/ru.json");
   const store = list.find((c) => c.id === "flowplan-app-store")!;
   assert.equal(txtFiles(store, "zh").get("app-store/name"), "store/app-store/zh-Hans/name.txt");
   assert.equal(txtFiles(store, "zh").get("google-play/title"), "store/google-play/zh-CN/title.txt");
@@ -37,6 +39,12 @@ test("components.json: every catalogue, valid, targets fr and zh only", () => {
   assert.equal((website.files as Record<string, string>).zh, "locales/site/zh.json");
   assert.throws(() => parseComponents('{"components":[{"id":"x","repo":"a/b","format":"po","targets":["fr"],"files":{}}]}'), /format/);
   assert.throws(() => parseComponents('{"components":[{"id":"x","repo":"a/b","format":"flat-json","targets":["de"],"files":{}}]}'), /targets/);
+  assert.throws(() => parseComponents('{"components":[{"id":"x","repo":"a/b","format":"flat-json","targets":["ru","ru"],"files":{"en":"en.json","ru":"ru.json"}}]}'), /targets/);
+  assert.throws(
+    () => parseComponents('{"components":[{"id":"x","repo":"a/b","format":"flat-json","targets":["fr","ru"],"files":{"en":"en.json","fr":"fr.json"}}]}'),
+    /no valid file for ru/,
+  );
+  assert.deepEqual(parseComponents('{"components":[{"id":"x","repo":"a/b","format":"flat-json","targets":["ru"],"files":{"en":"en.json","ru":"ru.json"}}]}')[0].targets, ["ru"]);
   assert.throws(
     () => parseComponents('{"components":[{"id":"x","repo":"a/b","format":"flat-json","targets":["fr"],"files":{"en":"../etc/passwd","fr":"fr.json"}}]}'),
     /no valid file for en/,
@@ -54,4 +62,10 @@ test("database: versioned migrations, components upserted, glossary seeded from 
     if (zh[term]) assert.equal(glossary("zh").find((g) => g.term === term)!.translation, zh[term]);
   }
   assert.match(languageNote("fr"), /vous/);
+  // Russian (migration 4): every core term, and the formal address as the note.
+  assert.equal(glossary("ru").length, glossary("fr").length);
+  assert.equal(glossary("ru").find((g) => g.term === "Workspace")!.translation, "Рабочее пространство");
+  assert.equal(glossary("ru").find((g) => g.term === "Database")!.translation, "База данных");
+  assert.equal(glossary("ru").find((g) => g.term === "Journal")!.translation, "Дневник");
+  assert.match(languageNote("ru"), /«вы».*never «ты»/);
 });

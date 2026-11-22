@@ -13,6 +13,7 @@ import { userForSessionToken } from "../lib/auth";
 
 useTempData();
 importFixture("flowplan-web", "flowplan");
+importFixture("flowplan-app-system", "flowplan-app");
 const stringId = (key: string) => one<{ id: number }>("SELECT id FROM strings WHERE component_id='flowplan-web' AND key=?", key)!.id;
 const call = (fn: () => Promise<Response> | Response) => handle(fn);
 const body = async (r: Response) => (await r.json()) as Record<string, unknown>;
@@ -51,6 +52,39 @@ test("saving: blocking checks answer 422 with the issues, a translator's save is
   assert.equal(huge.status, 413, "body size limit");
   const unknownLang = await call(() => saveRoute(req("/api/translations", { method: "POST", json: { stringId: id, lang: "de", text: "x" }, cookie })));
   assert.equal(unknownLang.status, 400);
+});
+
+test("Russian: saved where the component lists ru, refused elsewhere, unknown languages 400", async () => {
+  const { cookie } = signIn("helper-ru");
+  const reviewer = signIn("yannicschuller");
+  const save = (json: Record<string, unknown>, c = cookie) => call(() => saveRoute(req("/api/translations", { method: "POST", json, cookie: c })));
+  const web = stringId(RECORDS);
+  const missing = await save({ stringId: web, lang: "ru", text: " · записей" });
+  assert.equal(missing.status, 422, "the placeholder check works for ru");
+  const suggested = await save({ stringId: web, lang: "ru", text: " · записей: {0}" });
+  assert.equal(suggested.status, 200);
+  assert.equal((await body(suggested)).outcome, "suggested");
+  assert.equal(entryDetail(web, "ru")!.suggestions[0].text, " · записей: {0}");
+  const accepted = await save({ stringId: web, lang: "ru", text: " · записей: {0}" }, reviewer.cookie);
+  assert.equal((await body(accepted)).outcome, "accepted");
+  assert.equal(entryDetail(web, "ru")!.current!.text, " · записей: {0}");
+  // flowplan-app-system translates fr and zh only.
+  const app = one<{ id: number }>("SELECT id FROM strings WHERE component_id='flowplan-app-system' LIMIT 1")!.id;
+  assert.equal(entryDetail(app, "ru"), null);
+  for (const c of [cookie, reviewer.cookie]) {
+    const refused = await save({ stringId: app, lang: "ru", text: "Текст" }, c);
+    assert.equal(refused.status, 404);
+    assert.equal((await body(refused)).error, "not_found");
+  }
+  const confirm = await call(() => confirmRoute(req("/api/translations/confirm", { method: "POST", json: { stringId: app, lang: "ru" }, cookie })));
+  assert.equal(confirm.status, 404);
+  assert.equal((await save({ stringId: web, lang: "uk", text: "x" })).status, 400);
+  // The glossary takes Russian terms and the Russian note.
+  const term = await call(() => glossaryRoute(req("/api/glossary", { method: "POST", form: { lang: "ru", term: "Inbox", translation: "Входящие", note: "", next: "/glossary?lang=ru" }, cookie: reviewer.cookie })));
+  assert.equal(term.headers.get("location"), "/glossary?lang=ru&saved=1");
+  assert.equal(glossary("ru").find((g) => g.term === "Inbox")!.translation, "Входящие");
+  const bad = await call(() => glossaryRoute(req("/api/glossary", { method: "POST", form: { lang: "uk", term: "Inbox", translation: "Вхідні", next: "/glossary" }, cookie: reviewer.cookie })));
+  assert.match(bad.headers.get("location")!, /error=invalid_lang/);
 });
 
 test("roles: a translator cannot accept, sync, export or edit the glossary; a reviewer can accept", async () => {

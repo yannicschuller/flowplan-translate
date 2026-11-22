@@ -9,13 +9,15 @@
       "reference": "de",
       "targets": [
         "fr",
-        "zh"
+        "zh",
+        "ru"
       ],
       "files": {
         "en": "locales/en.json",
         "de": "locales/reference/de.json",
         "fr": "locales/fr.json",
-        "zh": "locales/zh.json"
+        "zh": "locales/zh.json",
+        "ru": "locales/ru.json"
       },
       "placeholders": [
         "index"

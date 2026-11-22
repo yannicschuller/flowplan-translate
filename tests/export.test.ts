@@ -134,6 +134,32 @@ test("keys missing in the target file are skipped and reported, never added", as
   assert.match(repo.pulls.get(pr.number)!.body, /Not included \(1\)/);
 });
 
+test("Russian: an accepted ru text is written to locales/ru.json, only there", async () => {
+  const reviewer = { ...signIn("yannicschuller").user, role: "reviewer" as const };
+  const repo = gh.repos.get(REPO)!;
+  // The previous test's pull request is merged first.
+  for (const pull of repo.pulls.values())
+    if (pull.state === "open") {
+      gh.commitFiles(REPO, "main", Object.fromEntries(repo.commits.get(repo.branches.get(pull.head)!)!.files), "merge");
+      Object.assign(pull, { state: "closed", merged: true });
+    }
+  await syncRepo(REPO);
+  await assert.rejects(createPullRequest(reviewer, REPO), (e: HttpError) => e.code === "nothing_to_export");
+  const before = gh.fileAt(REPO, "main", "locales/ru.json")!;
+  saveTranslation(reviewer, id("Database"), "ru", "База данных");
+  saveTranslation(reviewer, id(" · {0} records"), "ru", " · записей: {0}");
+  const pr = await createPullRequest(reviewer, REPO);
+  assert.deepEqual(pr.files, ["locales/ru.json"]);
+  assert.deepEqual(pr.languages, { ru: 2 });
+  const written = gh.fileAt(REPO, repo.pulls.get(pr.number)!.head, "locales/ru.json")!;
+  assert.equal(JSON.parse(written).Database, "База данных", "Cyrillic as is, not escaped");
+  assert.match(written, /"Database": "База данных"/);
+  assert.equal(JSON.parse(written)[" · {0} records"], " · записей: {0}");
+  assert.equal(Object.keys(JSON.parse(written)).join(), Object.keys(JSON.parse(before)).join(), "same keys, same order");
+  assert.equal(written.split("\n").filter((line, i) => line !== before.split("\n")[i]).length, 2, "only the two changed lines");
+  assert.match(repo.pulls.get(pr.number)!.body, /\| ru \| 2 \|/);
+});
+
 test("a repository without the App's installation: a readable sync error, other repositories still sync", async () => {
   const desktop = await syncRepo("yannicschuller/flowplan-desktop");
   assert.deepEqual(desktop.errors.map((e) => [e.code, e.message]), [["app_not_installed", "The GitHub App is not installed on yannicschuller/flowplan-desktop."]]);

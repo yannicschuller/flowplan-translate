@@ -37,6 +37,10 @@ test("a missing reference or target file is reported cleanly, a missing source f
   assert.deepEqual(noRef.errors, [], "the reference is optional");
   const noTarget = importFixture(WEB, "flowplan", { "locales/zh.json": null });
   assert.deepEqual(noTarget.errors.map((e) => e.message), ["file not found: locales/zh.json"]);
+  // Until flowplan's main has locales/ru.json: reported, the other languages sync.
+  const noRu = importFixture(WEB, "flowplan", { "locales/ru.json": null });
+  assert.deepEqual(noRu.errors.map((e) => e.message), ["file not found: locales/ru.json"]);
+  assert.equal(counts(WEB, "fr").done, Object.values(JSON.parse(read("locales/fr.json"))).filter(Boolean).length);
   const before = one<{ n: number }>("SELECT COUNT(*) AS n FROM strings WHERE component_id=? AND removed=0", WEB)!.n;
   const noSource = importFixture(WEB, "flowplan", { "locales/en.json": null });
   assert.deepEqual(noSource.errors.map((e) => e.message), ["file not found: locales/en.json"]);

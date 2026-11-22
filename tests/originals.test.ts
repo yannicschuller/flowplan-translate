@@ -37,7 +37,7 @@ test("originals: the German list is browsable and searchable, a missing German t
   const id = one<{ id: number }>("SELECT id FROM strings WHERE component_id='flowplan-web' AND key='Workspace'")!.id;
   const detail = originalDetail(id)!;
   assert.equal(detail.string.de_reference, "Arbeitsbereich");
-  assert.deepEqual(detail.glossary.map((g) => [g.lang, g.hits.map((h) => h.translation)]), [["fr", ["Espace de travail"]], ["zh", ["工作区"]]]);
+  assert.deepEqual(detail.glossary.map((g) => [g.lang, g.hits.map((h) => h.translation)]), [["fr", ["Espace de travail"]], ["zh", ["工作区"]], ["ru", ["Рабочее пространство"]]]);
 });
 
 test("originals: saving or confirming English or German is refused with 400", async () => {

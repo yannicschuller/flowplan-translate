@@ -23,6 +23,8 @@ const { one, closeDb } = await import("../../lib/db");
 const fixtures = join(root, "tests", "fixtures");
 const dirOf: Record<string, string> = { "yannicschuller/flowplan": "flowplan", "yannicschuller/flowplan-app": "flowplan-app", "yannicschuller/flowplan-desktop": "flowplan-desktop" };
 for (const c of components()) {
+  // Repositories without fixture catalogues (the website) stay unsynced.
+  if (!dirOf[c.repo]) continue;
   const files = new Map(allPaths(c).map((p) => {
     const file = join(fixtures, dirOf[c.repo], p);
     return [p, existsSync(file) ? readFileSync(file, "utf8") : null] as const;

@@ -85,6 +85,28 @@ test("checks: hints – whitespace, final punctuation, glossary", () => {
   assert.deepEqual(check({ source: "Open a workspace", text: "Ouvrir un bureau", glossary }).errors, [], "hints never block");
 });
 
+test("checks: Russian – placeholders, case, glossary terms in any case and number", () => {
+  const glossary = [
+    { id: 1, lang: "ru", term: "Workspace", translation: "Рабочее пространство", note: "" },
+    { id: 2, lang: "ru", term: "Database", translation: "База данных", note: "" },
+    { id: 3, lang: "ru", term: "Record", translation: "Запись", note: "" },
+  ];
+  const ru = (source: string, text: string) => check({ source, text, glossary });
+  assert.deepEqual(ru(" · {0} records", " · записей: {0}").hints, []);
+  assert.deepEqual(codes(ru(" · {0} records", " · записей"), "errors"), ["placeholders_missing"]);
+  assert.deepEqual(codes(ru(" · {0} records", " · {0} {1} записей"), "errors"), ["placeholders_extra"]);
+  assert.deepEqual(codes(ru(" · {0} records", " · Записей: {0}"), "hints"), ["case_differs"], "Cyrillic has case");
+  assert.deepEqual(ru("Open the workspace", "Открыть рабочее пространство").hints, []);
+  assert.deepEqual(ru("In the workspace", "В рабочем пространстве").hints, [], "prepositional case");
+  assert.deepEqual(ru("Select a database", "Выберите базу данных").hints, [], "accusative");
+  assert.deepEqual(ru("All records", "Все записи").hints, [], "plural");
+  assert.deepEqual(ru("No records", "Нет записей").hints, [], "genitive plural");
+  const unused = ru("Select a database", "Выберите таблицу");
+  assert.deepEqual(codes(unused, "hints"), ["glossary_unused"]);
+  assert.deepEqual(unused.hints[0].values, ["Database", "База данных"]);
+  assert.deepEqual(codes(ru("Saved.", "Сохранено"), "hints"), ["punctuation_differs"]);
+});
+
 test("placeholders: index style {0} only – a literal {Content} is text", () => {
   assert.deepEqual(placeholders("{0} in {Content}", ["index"]), ["{0}"]);
   assert.deepEqual(comparePlaceholders("{Content}", "{Contenu}", ["index"]), { missing: [], extra: [] });

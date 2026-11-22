@@ -4,7 +4,7 @@
 import { readFileSync, statSync } from "node:fs";
 import type { DatabaseSync } from "node:sqlite";
 import { config } from "./config";
-import { FORMATS, PLACEHOLDER_STYLES, isTargetLang, type Component, type Limit, type TxtGroup } from "./types";
+import { FORMATS, PLACEHOLDER_STYLES, TARGET_LANGS, isTargetLang, type Component, type Limit, type TxtGroup } from "./types";
 
 const cache = globalThis as unknown as { translateComponents?: { file: string; mtime: number; list: Component[] } };
 
@@ -33,7 +33,10 @@ export function parseComponents(raw: string): Component[] {
     const format = FORMATS.find((f) => f === c.format) ?? fail(`${where}: format must be one of ${FORMATS.join(", ")}`);
     const source = typeof c.source === "string" ? c.source : "en";
     const reference = typeof c.reference === "string" ? c.reference : undefined;
-    const targets = Array.isArray(c.targets) && c.targets.length && c.targets.every(isTargetLang) ? c.targets : fail(`${where}: targets must be a non-empty list of fr, zh`);
+    const targets =
+      Array.isArray(c.targets) && c.targets.length && c.targets.every(isTargetLang) && new Set(c.targets).size === c.targets.length
+        ? c.targets
+        : fail(`${where}: targets must be a non-empty list of ${TARGET_LANGS.join(", ")}, each once`);
     const langs = [source, ...(reference ? [reference] : []), ...targets];
     let files: Component["files"];
     if (format === "txt-files") {

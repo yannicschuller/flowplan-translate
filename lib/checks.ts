@@ -40,20 +40,25 @@ export function termRegex(term: string) {
 export function glossaryHits(source: string, glossary: GlossaryEntry[]) {
   return glossary.filter((g) => g.term.trim() && termRegex(g.term).test(source));
 }
+// A glossary word as a pattern. Latin words may take a plural s or x
+// ("Espace de travail" → "Espaces de travail"). Russian words change their
+// ending by case and number ("База данных" → "Базу данных", "Записи",
+// "Рабочем пространстве"): a final vowel, й or ь is dropped and any ending
+// of up to four letters allowed.
+function wordPattern(word: string) {
+  if (/^\p{Script=Cyrillic}{3,}$/u.test(word)) {
+    const stem = word.replace(/[аеёиоуыэюяйь]{1,2}$/iu, "");
+    return escapeRegex(stem.length >= 3 ? stem : word) + "\\p{Script=Cyrillic}{0,4}";
+  }
+  return escapeRegex(word) + (/^\p{L}{3,}$/u.test(word) ? "[sx]?" : "");
+}
 // Is the glossary translation (or one of its " / " alternatives) used?
-// Words may take a plural s or x ("Espace de travail" → "Espaces de travail").
 function usesTranslation(text: string, translation: string) {
   return translation
     .split(/\s+\/\s+/)
     .map((alt) => alt.trim())
     .filter(Boolean)
-    .some((alt) => {
-      const pattern = alt
-        .split(/\s+/)
-        .map((word) => escapeRegex(word) + (/^\p{L}{3,}$/u.test(word) ? "[sx]?" : ""))
-        .join("\\s+");
-      return new RegExp(pattern, "iu").test(text);
-    });
+    .some((alt) => new RegExp(alt.split(/\s+/).map(wordPattern).join("\\s+"), "iu").test(text));
 }
 
 export type CheckInput = {
@@ -100,7 +105,7 @@ export function checkTranslation(input: CheckInput): CheckResult {
     if (lead(source) !== lead(text) || trail(source) !== trail(text)) hints.push({ code: "whitespace_differs" });
   }
   // Fragments keep the source's case and leading mark (lib/fragment.ts);
-  // a script without case (Chinese) is never compared.
+  // a script without case (Chinese) is never compared; Cyrillic has case and is.
   const wantCase = initialCase(source, input.placeholders);
   const haveCase = initialCase(text, input.placeholders);
   if (wantCase && haveCase && wantCase !== haveCase) hints.push({ code: "case_differs", values: [wantCase, haveCase] });

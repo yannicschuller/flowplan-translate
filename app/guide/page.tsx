@@ -4,8 +4,8 @@ import { pageT } from "@/lib/page";
 import { PlaceholderText } from "@/components/placeholder-text";
 import type { PlaceholderStyle } from "@/lib/types";
 
-// The rules for translators, for every language here (French and
-// Simplified Chinese) and per language. Static text, no data.
+// The rules for translators, for every language here (French, Simplified
+// Chinese and Russian) and per language. Static text, no data.
 export const dynamic = "force-dynamic";
 
 const DISCORD = "https://discord.gg/bCEdB6MPrR";
@@ -180,6 +180,38 @@ export default async function Guide() {
             <li>
               {t("Verwende die offiziellen Begriffe der Plattformen (z. B. „设置“ für Settings) und Flowplans ", "Use the platforms' official terms (e.g. “设置” for Settings) and Flowplan's ")}
               <Link href="/glossary?lang=zh">{t("Glossar", "glossary")}</Link>.
+            </li>
+          </ul>
+        </section>
+
+        <section className="card stack" aria-labelledby="g-ru">
+          <h2 id="g-ru">
+            <span lang="ru">Русский</span> <span className="muted">· {t("Russisch", "Russian")}</span>
+          </h2>
+          <ul>
+            <li>
+              {t(
+                "Überall die Sie-Form „вы“ (klein geschrieben, wie bei Apple, Google und Microsoft), nie „ты“; Aufforderungen ebenso: „Нажмите“, „Выберите“.",
+                "Formal “вы” everywhere (lowercase, as Apple, Google and Microsoft write it), never “ты”; requests the same way: “Нажмите”, “Выберите”.",
+              )}
+            </li>
+            <li>
+              {t(
+                "Anführungszeichen « », kein Leerzeichen vor : ; ! ?. Russisch hat mehrere Pluralformen, der Code aber keine Pluralregeln: Bei Zahlen wähle eine Form, die zu jeder Anzahl passt.",
+                "Quotes « », no space before : ; ! ?. Russian has several plural forms but the code has no plural rules: with numbers, pick a form that fits any count.",
+              )}
+              <dl className="guide-example">
+                <Example label={t("Englisch", "English")} text=" · {0} records" lang="en" />
+                <Example label="✓" text=" · записей: {0}" lang="ru" />
+                <Example label="✗" text=" · {0} записи" lang="ru" bad />
+              </dl>
+            </li>
+            <li>
+              {t(
+                "Verwende die offiziellen Begriffe der Plattformen (z. B. „Настройки“ für Settings) und Flowplans ",
+                "Use the platforms' official terms (e.g. “Настройки” for Settings) and Flowplan's ",
+              )}
+              <Link href="/glossary?lang=ru">{t("Glossar", "glossary")}</Link>.
             </li>
           </ul>
         </section>

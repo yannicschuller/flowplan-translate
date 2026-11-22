@@ -11,10 +11,12 @@ export type Format = (typeof FORMATS)[number];
 export const PLACEHOLDER_STYLES = ["index", "brace", "printf", "dollar"] as const;
 export type PlaceholderStyle = (typeof PLACEHOLDER_STYLES)[number];
 
-// The languages translated here (version 1): French and Simplified Chinese.
-export const TARGET_LANGS = ["fr", "zh"] as const;
+// Every language this tool can translate into: French, Simplified Chinese
+// and Russian. Which of them a component offers is its `targets` list in
+// components.json (Russian, for now, only for the web app).
+export const TARGET_LANGS = ["fr", "zh", "ru"] as const;
 export type TargetLang = (typeof TARGET_LANGS)[number];
-export const isTargetLang = (v: unknown): v is TargetLang => v === "fr" || v === "zh";
+export const isTargetLang = (v: unknown): v is TargetLang => (TARGET_LANGS as readonly unknown[]).includes(v);
 // English (the source) and German (the reference) are shown read-only as
 // "Original" languages: browsable and searchable, never written.
 export const ORIGINAL_LANGS = ["en", "de"] as const;
@@ -27,6 +29,7 @@ export const LANG_NAMES: Record<ViewLang, { de: string; en: string; native: stri
   de: { de: "Deutsch", en: "German", native: "Deutsch" },
   fr: { de: "Französisch", en: "French", native: "Français" },
   zh: { de: "Chinesisch (vereinfacht)", en: "Chinese (Simplified)", native: "简体中文" },
+  ru: { de: "Russisch", en: "Russian", native: "Русский" },
 };
 
 // A length limit, counted like flowplan-app's test/store.test.ts: on the

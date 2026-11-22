@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { importFixture, req, signIn, useTempData } from "./helpers";
 import { one } from "../lib/db";
-import { badgeColor, badgeMarkdown, coverage, renderSvg, textWidth } from "../lib/badge";
+import { badgeColor, badgeMarkdown, coverage, percent, renderSvg, textWidth } from "../lib/badge";
 import { badgeRoute } from "../lib/routes";
 import { counts, saveTranslation } from "../lib/store";
 import { handle } from "../lib/http";
@@ -84,6 +84,31 @@ test("400 without lang, grey 404 for unknown language, repository or component",
     assert.equal(data.message, "unknown");
     assert.equal(data.color, "9f9f9f");
   }
+});
+
+test("Russian: only components that translate ru count, labelled Русский", async () => {
+  const web = coverage(["flowplan-web"], "ru");
+  assert.ok(web.total > 0);
+  const component = await (await get("component=flowplan-web&lang=ru&format=json")).json();
+  assert.deepEqual(component, { schemaVersion: 1, label: "Русский", message: `${percent(web.done, web.total)} %`, color: badgeColor(percent(web.done, web.total)) });
+  const svg = await get("repo=flowplan&lang=ru");
+  assert.equal(svg.status, 200);
+  assert.match(await svg.text(), /<title>Русский: \d+ % translated<\/title>/);
+  // Everything = the web app only; a repository without ru is unknown.
+  assert.equal((await (await get("lang=ru&format=json")).json()).message, component.message);
+  for (const q of ["repo=flowplan-app&lang=ru", "component=flowplan-app-system&lang=ru"]) {
+    const r = await get(`${q}&format=json`);
+    assert.equal(r.status, 404, q);
+    assert.equal((await r.json()).message, "unknown");
+  }
+  const reviewer = { ...signIn("yannicschuller").user, role: "reviewer" as const };
+  const id = one<{ id: number }>("SELECT id FROM strings WHERE component_id='flowplan-web' AND key='Workspace'")!.id;
+  saveTranslation(reviewer, id, "ru", "Рабочее пространство");
+  assert.equal(coverage(["flowplan-web"], "ru").done, web.done + 1);
+  assert.equal(
+    badgeMarkdown("https://translate.flowplan.org", "yannicschuller/flowplan", "ru", "flowplan-web"),
+    "[![Русский](https://translate.flowplan.org/api/badge?repo=flowplan&lang=ru)](https://translate.flowplan.org/c/flowplan-web/ru)",
+  );
 });
 
 test("escaping, label override and CJK width", async () => {
