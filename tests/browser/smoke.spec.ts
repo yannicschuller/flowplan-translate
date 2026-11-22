@@ -76,6 +76,12 @@ test("translate, see the placeholder check block, fix it, accept as reviewer", a
   // The overview now offers a pull request for the accepted text.
   await review.goto("/");
   await expect(review.getByRole("button", { name: /Create pull request \(1\)/ })).toBeEnabled();
+  // One row per part, one cell per language: the cell links to its list, its counters to the filters.
+  const row = review.getByRole("row", { name: /Flowplan · web app/ });
+  await expect(row.getByRole("link", { name: /^French – Flowplan · web app:\s*\d+%\s*\(\d+ of \d+ done\)$/ })).toHaveAttribute("href", "/c/flowplan-web/fr");
+  await expect(row.getByRole("link", { name: /missing – French, Flowplan · web app/ })).toHaveAttribute("href", "/c/flowplan-web/fr?filter=missing");
+  await expect(row.getByRole("link", { name: /^EN – English, original and source of Flowplan · web app/ })).toHaveAttribute("href", "/c/flowplan-web/en");
+  await expect(row.getByRole("link", { name: /^DE – German, original of Flowplan · web app/ })).toHaveAttribute("href", "/c/flowplan-web/de");
   // The README badge of the repository, as a browser loads it.
   const badge = await review.request.get("/api/badge?repo=flowplan&lang=fr");
   expect(badge.status()).toBe(200);

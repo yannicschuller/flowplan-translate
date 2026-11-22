@@ -5,10 +5,10 @@ import { counts, originalCounts } from "@/lib/store";
 import { syncState } from "@/lib/sync";
 import { pendingCount, trackedPull } from "@/lib/export";
 import { formatDateTime, formatNumber } from "@/lib/i18n";
-import { LANG_NAMES, ORIGINAL_LANGS } from "@/lib/types";
+import { LANG_NAMES, ORIGINAL_LANGS, TARGET_LANGS } from "@/lib/types";
 import { errorMessage } from "@/lib/notices";
 import { config } from "@/lib/config";
-import { badgeMarkdown } from "@/lib/badge";
+import { badgeMarkdown, percent } from "@/lib/badge";
 import { refreshPullsIfStale } from "@/lib/pulls";
 import { ProgressBar } from "@/components/progress-bar";
 
@@ -22,6 +22,7 @@ export default async function Overview({ searchParams }: { searchParams: Promise
   const param = (k: string) => (typeof sp[k] === "string" ? (sp[k] as string) : "");
   const n = (v: number) => formatNumber(locale, v);
   const here = "/";
+  const langName = (lang: keyof typeof LANG_NAMES) => (locale === "de" ? LANG_NAMES[lang].de : LANG_NAMES[lang].en);
   return (
     <>
       <div className="page-head">
@@ -48,10 +49,20 @@ export default async function Overview({ searchParams }: { searchParams: Promise
           const state = syncState(repo);
           const open = trackedPull(repo);
           const pending = pendingCount(repo);
+          // One column per target language any part of the repository offers.
+          const langs = TARGET_LANGS.filter((l) => componentsOf(repo).some((c) => c.targets.includes(l)));
+          // Coverage per language across the repository's parts, as the README badge counts it.
+          const summary = langs.map((lang) => {
+            const sum = componentsOf(repo)
+              .filter((c) => c.targets.includes(lang))
+              .map((c) => counts(c.id, lang))
+              .reduce((a, k) => ({ total: a.total + k.total, done: a.done + k.done }), { total: 0, done: 0 });
+            return { lang, total: sum.total, pct: percent(sum.done, sum.total) };
+          });
           return (
             <section key={repo} className="card repo" aria-labelledby={`repo-${repo}`}>
               <div className="repo-head">
-                <div>
+                <div className="repo-title">
                   <h2 id={`repo-${repo}`}>
                     <a href={`https://github.com/${repo}`}>{repo}</a>
                   </h2>
@@ -66,6 +77,16 @@ export default async function Overview({ searchParams }: { searchParams: Promise
                       </>
                     )}
                   </p>
+                  {summary.some((x) => x.total > 0) && (
+                    <p className="repo-sum">
+                      <span className="visually-hidden">{t("Gesamtstand: ", "Overall: ")}</span>
+                      {summary.map((x) => (
+                        <span key={x.lang} className={x.total && x.pct === 100 ? "sum complete" : "sum"}>
+                          <span lang={x.lang}>{LANG_NAMES[x.lang].native}</span> <b>{x.total ? t(`${n(x.pct)} %`, `${n(x.pct)}%`) : "–"}</b>
+                        </span>
+                      ))}
+                    </p>
+                  )}
                 </div>
                 {reviewer && (
                   <div className="repo-actions">
@@ -107,101 +128,129 @@ export default async function Overview({ searchParams }: { searchParams: Promise
                   ))}
                 </ul>
               )}
-              <table className="progress-table">
-                <thead>
-                  <tr>
-                    <th scope="col">{t("Bereich", "Part")}</th>
-                    <th scope="col">{t("Sprache", "Language")}</th>
-                    <th scope="col">{t("Fortschritt", "Progress")}</th>
-                    <th scope="col" className="num">
-                      {t("Fertig", "Done")}
-                    </th>
-                    <th scope="col" className="num">
-                      {t("Veraltet", "Outdated")}
-                    </th>
-                    <th scope="col" className="num">
-                      {t("Fehlt", "Missing")}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {componentsOf(repo).flatMap((c) => [
-                    // The originals first: read-only, always complete.
-                    ...ORIGINAL_LANGS.map((lang) => {
+              <div className="matrix-wrap">
+                <table className="matrix">
+                  <caption className="visually-hidden">{t(`Fortschritt in ${repo} je Bereich und Sprache`, `Progress in ${repo} per part and language`)}</caption>
+                  <thead>
+                    <tr>
+                      <th scope="col" className="part">
+                        {t("Bereich", "Part")}
+                      </th>
+                      <th scope="col" className="texts">
+                        {t("Texte · Original", "Texts · original")}
+                      </th>
+                      {langs.map((lang) => (
+                        <th key={lang} scope="col" className="target">
+                          <span lang={lang}>{LANG_NAMES[lang].native}</span>
+                          <span className="visually-hidden"> ({langName(lang)})</span>
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {componentsOf(repo).map((c) => {
                       const o = originalCounts(c.id);
-                      const href = `/c/${c.id}/${lang}`;
-                      const name = locale === "de" ? LANG_NAMES[lang].de : LANG_NAMES[lang].en;
                       const onlyInCode = o.total - o.german;
+                      const cut = c.title.indexOf(" · ");
                       return (
-                        <tr key={`${c.id}-${lang}`} className="original-row">
-                          <td className="component-cell">
-                            <Link href={href}>{c.title}</Link>
-                          </td>
-                          <td className="lang">
-                            <Link href={href} lang={lang}>
-                              {LANG_NAMES[lang].native}
-                            </Link>
-                            <span className="visually-hidden"> ({name})</span>
-                          </td>
-                          <td className="progress-cell">
-                            {o.total ? (
-                              <span className="row">
-                                <span className="badge original">{lang === "en" ? t("Original · Ausgangstext", "Original · source") : t("Original", "Original")}</span>
-                                {lang === "de" && onlyInCode > 0 && <span className="muted small">{t(`${n(onlyInCode)} nur im Code`, `${n(onlyInCode)} only in the code`)}</span>}
-                              </span>
+                        <tr key={c.id}>
+                          <th scope="row" className="part">
+                            {cut > 0 ? (
+                              <>
+                                <span className="part-prefix">{c.title.slice(0, cut)} · </span>
+                                {c.title.slice(cut + 3)}
+                              </>
                             ) : (
-                              <span className="muted small">{t("Noch keine Texte", "No texts yet")}</span>
+                              c.title
                             )}
+                          </th>
+                          <td className="texts" data-label={t("Texte", "Texts")}>
+                            <span className="texts-line">
+                              <span className={o.total ? "count" : "count muted"}>{n(o.total)}</span>
+                              {/* The originals: read-only lists to browse and search. */}
+                              {ORIGINAL_LANGS.map((lang) => (
+                                <Link
+                                  key={lang}
+                                  href={`/c/${c.id}/${lang}`}
+                                  className="chip"
+                                  title={lang === "en" ? t(`Englisch · Original · Ausgangstext (${n(o.total)})`, `English · original · source (${n(o.total)})`) : t(`Deutsch · Original (${n(o.german)})`, `German · original (${n(o.german)})`)}
+                                >
+                                  {lang.toUpperCase()}
+                                  <span className="visually-hidden">
+                                    {lang === "en"
+                                      ? t(` – Englisch, Original und Ausgangstext von ${c.title}: ${n(o.total)} Texte`, ` – English, original and source of ${c.title}: ${n(o.total)} texts`)
+                                      : t(` – Deutsch, Original von ${c.title}: ${n(o.german)} Texte`, ` – German, original of ${c.title}: ${n(o.german)} texts`)}
+                                  </span>
+                                </Link>
+                              ))}
+                            </span>
+                            {onlyInCode > 0 && <span className="cell-note muted">{t(`${n(onlyInCode)} nur im Code`, `${n(onlyInCode)} only in the code`)}</span>}
                           </td>
-                          <td className="num" data-label={t("Texte", "Texts")}>
-                            {n(lang === "en" ? o.total : o.german)}
-                          </td>
-                          <td className="num na" data-label={t("Veraltet", "Outdated")}>
-                            –
-                          </td>
-                          <td className="num na" data-label={t("Fehlt", "Missing")}>
-                            –
-                          </td>
+                          {langs.map((lang) => {
+                            const name = langName(lang);
+                            if (!c.targets.includes(lang))
+                              return (
+                                <td key={lang} className="target na" data-label={LANG_NAMES[lang].native} title={t("Diese Sprache gibt es hier nicht", "Not offered here")}>
+                                  <span aria-hidden="true">–</span>
+                                  <span className="visually-hidden">{t(`${name}: hier nicht angeboten`, `${name}: not offered here`)}</span>
+                                </td>
+                              );
+                            const k = counts(c.id, lang);
+                            const href = `/c/${c.id}/${lang}`;
+                            const pct = percent(k.done, k.total);
+                            const complete = k.total > 0 && k.done === k.total;
+                            const pctText = t(`${n(pct)} %`, `${n(pct)}%`);
+                            return (
+                              <td key={lang} className="target" data-label={LANG_NAMES[lang].native}>
+                                <div className="cell">
+                                {k.total ? (
+                                  <Link href={href} className={complete ? "cell-link complete" : "cell-link"} title={t(`${n(k.done)} von ${n(k.total)} fertig`, `${n(k.done)} of ${n(k.total)} done`)}>
+                                    <span className="visually-hidden">{`${name} – ${c.title}: `}</span>
+                                    {complete ? (
+                                      <span className="pct">
+                                        <span aria-hidden="true">✓ </span>
+                                        {pctText}
+                                      </span>
+                                    ) : (
+                                      <>
+                                        <ProgressBar className="thin" total={k.total} done={k.done} outdated={k.outdated} />
+                                        <span className="pct">{pctText}</span>
+                                      </>
+                                    )}
+                                    <span className="visually-hidden">{t(` (${n(k.done)} von ${n(k.total)} fertig)`, ` (${n(k.done)} of ${n(k.total)} done)`)}</span>
+                                  </Link>
+                                ) : (
+                                  <Link href={href} className="cell-link empty">
+                                    <span className="visually-hidden">{`${name} – ${c.title}: `}</span>
+                                    {t("Noch keine Texte", "No texts yet")}
+                                  </Link>
+                                )}
+                                {(k.outdated > 0 || k.missing > 0) && (
+                                  <span className="counters">
+                                    {k.outdated > 0 && (
+                                      <Link href={`${href}?filter=outdated`} className="outdated">
+                                        {t(`${n(k.outdated)} veraltet`, `${n(k.outdated)} outdated`)}
+                                        <span className="visually-hidden">{` – ${name}, ${c.title}`}</span>
+                                      </Link>
+                                    )}
+                                    {k.missing > 0 && (
+                                      <Link href={`${href}?filter=missing`} className="missing">
+                                        {k.missing === 1 ? t("1 fehlt", "1 missing") : t(`${n(k.missing)} fehlen`, `${n(k.missing)} missing`)}
+                                        <span className="visually-hidden">{` – ${name}, ${c.title}`}</span>
+                                      </Link>
+                                    )}
+                                  </span>
+                                )}
+                                </div>
+                              </td>
+                            );
+                          })}
                         </tr>
                       );
-                    }),
-                    ...c.targets.map((lang) => {
-                      const k = counts(c.id, lang);
-                      const href = `/c/${c.id}/${lang}`;
-                      const name = locale === "de" ? LANG_NAMES[lang].de : LANG_NAMES[lang].en;
-                      return (
-                        <tr key={`${c.id}-${lang}`}>
-                          <td className="component-cell">
-                            <Link href={href}>{c.title}</Link>
-                          </td>
-                          <td className="lang">
-                            <Link href={href} lang={lang}>
-                              {LANG_NAMES[lang].native}
-                            </Link>
-                            <span className="visually-hidden"> ({name})</span>
-                          </td>
-                          <td className="progress-cell">
-                            {k.total ? (
-                              <ProgressBar total={k.total} done={k.done} outdated={k.outdated} label={t(`${c.title}, ${name}: ${n(k.done)} von ${n(k.total)} fertig`, `${c.title}, ${name}: ${n(k.done)} of ${n(k.total)} done`)} />
-                            ) : (
-                              <span className="muted small">{t("Noch keine Texte", "No texts yet")}</span>
-                            )}
-                          </td>
-                          <td className="num" data-label={t("Fertig", "Done")}>
-                            {n(k.done)}
-                          </td>
-                          <td className="num" data-label={t("Veraltet", "Outdated")}>
-                            {k.outdated ? <Link href={`${href}?filter=outdated`}>{n(k.outdated)}</Link> : n(k.outdated)}
-                          </td>
-                          <td className="num" data-label={t("Fehlt", "Missing")}>
-                            {k.missing ? <Link href={`${href}?filter=missing`}>{n(k.missing)}</Link> : n(k.missing)}
-                          </td>
-                        </tr>
-                      );
-                    }),
-                  ])}
-                </tbody>
-              </table>
+                    })}
+                  </tbody>
+                </table>
+              </div>
               <details className="badges">
                 <summary>{t("Badge für dein README", "Badge for your README")}</summary>
                 <p className="muted small">

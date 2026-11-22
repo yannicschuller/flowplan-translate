@@ -1,11 +1,13 @@
 // Done and outdated as an SVG bar: widths are SVG attributes, so no style
-// attribute is needed under the strict CSP.
-export function ProgressBar({ total, done, outdated, label }: { total: number; done: number; outdated: number; label: string }) {
+// attribute is needed under the strict CSP. Without a label the bar is
+// decorative (its link or text says the numbers).
+export function ProgressBar({ total, done, outdated, label, className }: { total: number; done: number; outdated: number; label?: string; className?: string }) {
   const pct = (n: number) => (total ? Math.round((n / total) * 1000) / 10 : 0);
   const d = pct(done);
   const o = Math.min(pct(outdated), 100 - d);
+  const a11y = label ? { role: "img", "aria-label": label } : { "aria-hidden": true };
   return (
-    <svg className="progress" viewBox="0 0 100 8" preserveAspectRatio="none" role="img" aria-label={label}>
+    <svg className={className ? `progress ${className}` : "progress"} viewBox="0 0 100 8" preserveAspectRatio="none" {...a11y}>
       <rect className="track" x="0" y="0" width="100" height="8" />
       <rect className="done" x="0" y="0" width={d} height="8" />
       <rect className="outdated" x={d} y="0" width={o} height="8" />

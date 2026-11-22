@@ -461,28 +461,55 @@ form.inline {
 }
 
 /* ---------- Overview ---------- */
-.repo {
+/* Per repository: one row per part, one column per target language. */
+.card.repo {
   display: grid;
-  gap: 14px;
+  gap: 10px;
+  padding: 14px 16px;
+}
+.stack:has(> .repo) {
+  gap: 12px;
 }
 .repo-head {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px 16px;
+  gap: 8px 16px;
   align-items: center;
 }
+.repo-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 12px;
+  min-width: 0;
+}
 .repo-head h2 {
-  font-size: 17px;
+  font-size: 16px;
 }
 .repo-meta {
   color: var(--muted);
   font-size: 13px;
 }
+.repo-sum {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  font-size: 13px;
+  color: var(--secondary);
+}
+.repo-sum b {
+  font-weight: 620;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.repo-sum .sum.complete b {
+  color: var(--ok);
+}
 .repo-actions {
   margin-left: auto;
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
 }
 .problems {
   margin: 0;
@@ -493,52 +520,154 @@ form.inline {
 .problems.notes {
   color: var(--warn);
 }
-.progress-table {
-  width: 100%;
-  border-collapse: collapse;
+.matrix-wrap {
+  min-width: 0;
 }
-.progress-table th,
-.progress-table td {
+.matrix {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  font-size: 14px;
+  line-height: 1.4;
+}
+.matrix th,
+.matrix td {
   text-align: left;
-  padding: 9px 8px;
+  padding: 6px 10px;
   border-top: 1px solid var(--border);
   vertical-align: middle;
 }
-.progress-table th {
+.matrix thead th {
   font-size: 12px;
   font-weight: 600;
   color: var(--muted);
+  border-top: 0;
+  padding-top: 0;
+  padding-bottom: 4px;
+  white-space: nowrap;
+}
+.matrix thead th.part,
+.matrix thead th.texts {
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  border-top: 0;
+  font-size: 11px;
 }
-.progress-table .num {
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
+.matrix thead th.target {
+  color: var(--secondary);
+  font-size: 13px;
 }
-.progress-table .lang {
-  white-space: nowrap;
+.matrix th:first-child,
+.matrix td:first-child {
+  padding-left: 0;
+}
+.matrix th:last-child,
+.matrix td:last-child {
+  padding-right: 0;
+}
+.matrix tbody th.part {
   font-weight: 560;
 }
-.progress-cell {
-  min-width: 120px;
+.part-prefix {
+  color: var(--muted);
+  font-weight: 450;
 }
-.progress {
+.matrix .texts {
+  width: 140px;
+  white-space: nowrap;
+}
+.matrix thead th.target {
+  width: 230px;
+}
+.texts-line {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.texts-line .count {
+  min-width: 3ch;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-weight: 560;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 6px;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  line-height: 18px;
+  background: var(--blue-light);
+  color: var(--accent-strong);
+}
+.chip:hover {
+  text-decoration: none;
+  background: var(--blue);
+  color: var(--on-accent);
+}
+.cell-note {
   display: block;
-  width: 100%;
-  height: 8px;
-  border-radius: 99px;
-  overflow: hidden;
+  font-size: 12px;
 }
-.progress .track {
-  fill: var(--track);
+.cell {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 10px;
 }
-.progress .done {
-  fill: var(--ok);
+.matrix td.na {
+  color: var(--muted);
 }
-.progress .outdated {
-  fill: var(--warn);
+.cell-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 116px;
+  color: var(--text);
+  border-radius: 4px;
+}
+.cell-link:hover {
+  text-decoration: none;
+}
+.cell-link:hover .pct {
+  color: var(--blue);
+  text-decoration: underline;
+}
+.progress.thin {
+  flex: 1 1 auto;
+  min-width: 40px;
+  height: 6px;
+}
+.cell-link .pct {
+  flex: none;
+  min-width: 4ch;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-weight: 560;
+}
+.cell-link.complete .pct {
+  color: var(--ok);
+  text-align: left;
+}
+.cell-link.empty {
+  width: auto;
+  color: var(--muted);
+  font-size: 13px;
+}
+.counters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 8px;
+  font-size: 12.5px;
+  line-height: 1.35;
+}
+.counters a {
+  color: var(--secondary);
+  white-space: nowrap;
+}
+.counters a.outdated {
+  color: var(--warn);
 }
 .legend {
   display: flex;
@@ -561,57 +690,68 @@ form.inline {
 .dot.outdated {
   background: var(--warn);
 }
-.progress-table {
-  table-layout: fixed;
+.progress {
+  display: block;
+  width: 100%;
+  height: 8px;
+  border-radius: 99px;
+  overflow: hidden;
 }
-.progress-table .component-cell {
-  width: 30%;
+.progress .track {
+  fill: var(--track);
 }
-.progress-table .lang {
-  width: 14%;
+.progress .done {
+  fill: var(--ok);
 }
-.progress-table .num {
-  width: 11%;
+.progress .outdated {
+  fill: var(--warn);
 }
+/* Narrow screens: each part as a small card, its languages side by side. */
 @media (max-width: 720px) {
-  .progress-table thead {
+  .matrix thead {
     display: none;
   }
-  .progress-table tr {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: 4px 14px;
+  .matrix,
+  .matrix tbody {
+    display: block;
+  }
+  .matrix tr {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 6px 16px;
     padding: 10px 0;
     border-top: 1px solid var(--border);
   }
-  .progress-table td,
-  .progress-table .component-cell,
-  .progress-table .lang,
-  .progress-table .num {
+  .matrix tbody th.part,
+  .matrix td {
     border: 0;
     padding: 0;
     width: auto;
-  }
-  .progress-table .component-cell {
-    flex: 1 1 auto;
     min-width: 0;
   }
-  .progress-table .progress-cell {
-    flex: 1 1 100%;
-    width: auto;
-    min-width: 0;
-    padding: 4px 0;
+  .matrix tbody th.part {
+    grid-column: 1 / -1;
   }
-  .progress-table .num {
-    text-align: left;
-    font-size: 13px;
+  .matrix td.texts {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 2px 8px;
   }
-  .progress-table .num::before {
-    content: attr(data-label) " ";
+  .matrix td::before {
+    content: attr(data-label);
+    display: block;
+    font-size: 12px;
     color: var(--muted);
   }
-  .progress-table .num.na {
+  .matrix td.texts::before {
+    display: inline;
+  }
+  .matrix td.texts .cell-note {
+    display: inline;
+  }
+  .matrix td.na {
     display: none;
   }
 }
