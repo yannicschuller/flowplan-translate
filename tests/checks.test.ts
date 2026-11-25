@@ -107,6 +107,43 @@ test("checks: Russian – placeholders, case, glossary terms in any case and num
   assert.deepEqual(codes(ru("Saved.", "Сохранено"), "hints"), ["punctuation_differs"]);
 });
 
+test("checks: Polish – placeholders, case, glossary terms in any case and number", () => {
+  const glossary = [
+    { id: 1, lang: "pl", term: "Workspace", translation: "Obszar roboczy", note: "" },
+    { id: 2, lang: "pl", term: "Database", translation: "Baza danych", note: "" },
+    { id: 3, lang: "pl", term: "Record", translation: "Rekord", note: "" },
+    { id: 4, lang: "pl", term: "Task", translation: "Zadanie", note: "" },
+    { id: 5, lang: "pl", term: "Inbox", translation: "Skrzynka odbiorcza", note: "" },
+    { id: 6, lang: "pl", term: "Member", translation: "Członek", note: "" },
+    { id: 7, lang: "pl", term: "Space", translation: "Przestrzeń", note: "" },
+    { id: 8, lang: "pl", term: "Dashboard", translation: "Pulpit nawigacyjny", note: "" },
+  ];
+  const pl = (source: string, text: string) => check({ source, text, glossary });
+  assert.deepEqual(pl(" · {0} records", " · rekordy: {0}").hints, []);
+  assert.deepEqual(codes(pl(" · {0} records", " · rekordy"), "errors"), ["placeholders_missing"]);
+  assert.deepEqual(codes(pl(" · {0} records", " · {0} {1} rekordów"), "errors"), ["placeholders_extra"]);
+  assert.deepEqual(codes(pl(" · {0} records", " · Rekordy: {0}"), "hints"), ["case_differs"]);
+  assert.deepEqual(pl("Open the workspace", "Otwórz obszar roboczy").hints, []);
+  assert.deepEqual(pl("In the workspace", "W obszarze roboczym").hints, [], "locative");
+  assert.deepEqual(pl("Select a database", "Wybierz bazę danych").hints, [], "accusative");
+  assert.deepEqual(pl("In the database", "W bazie danych").hints, [], "locative");
+  assert.deepEqual(pl("All records", "Wszystkie rekordy").hints, [], "plural");
+  assert.deepEqual(pl("No records", "Brak rekordów").hints, [], "genitive plural");
+  assert.deepEqual(pl("No tasks", "Brak zadań").hints, [], "n → ń");
+  assert.deepEqual(pl("In the inbox", "W skrzynce odbiorczej").hints, [], "k → c");
+  assert.deepEqual(pl("Add a member", "Dodaj członka").hints, [], "a dropped e");
+  assert.deepEqual(pl("In this space", "W tej przestrzeni").hints, [], "ń → n");
+  assert.deepEqual(pl("On the dashboard", "Na pulpicie nawigacyjnym").hints, [], "t → c");
+  const unused = pl("Select a database", "Wybierz tabelę");
+  assert.deepEqual(codes(unused, "hints"), ["glossary_unused"]);
+  assert.deepEqual(unused.hints[0].values, ["Database", "Baza danych"]);
+  assert.deepEqual(codes(pl("Open a record", "Otwórz wpis"), "hints"), ["glossary_unused"]);
+  // Only Polish entries inflect this way: a French term still takes s or x only.
+  const fr = [{ id: 9, lang: "fr", term: "Database", translation: "Base de données", note: "" }];
+  assert.deepEqual(codes(check({ source: "Select a database", text: "Choisir une basique de données", glossary: fr }), "hints"), ["glossary_unused"]);
+  assert.deepEqual(codes(pl("Saved.", "Zapisano"), "hints"), ["punctuation_differs"]);
+});
+
 test("placeholders: index style {0} only – a literal {Content} is text", () => {
   assert.deepEqual(placeholders("{0} in {Content}", ["index"]), ["{0}"]);
   assert.deepEqual(comparePlaceholders("{Content}", "{Contenu}", ["index"]), { missing: [], extra: [] });

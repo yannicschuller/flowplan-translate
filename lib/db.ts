@@ -4,7 +4,7 @@ import { DatabaseSync, type SQLInputValue } from "node:sqlite";
 import { mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { config } from "./config";
-import { GLOSSARY_SEED, GLOSSARY_SEED_RU, LANGUAGE_NOTES_SEED, LANGUAGE_NOTES_SEED_RU } from "./glossary-seed";
+import { GLOSSARY_SEED, GLOSSARY_SEED_PL, GLOSSARY_SEED_RU, LANGUAGE_NOTES_SEED, LANGUAGE_NOTES_SEED_PL, LANGUAGE_NOTES_SEED_RU } from "./glossary-seed";
 import { upsertComponents } from "./components";
 
 const sqlString = (s: string) => `'${s.replace(/'/g, "''")}'`;
@@ -132,6 +132,8 @@ const MIGRATIONS: string[] = [
   `ALTER TABLE pull_requests ADD COLUMN checked_at INTEGER;`,
   // 4: Russian (ru) – its core glossary terms and its language note
   seedSql(GLOSSARY_SEED_RU, LANGUAGE_NOTES_SEED_RU),
+  // 5: Polish (pl) – its core glossary terms and its language note
+  seedSql(GLOSSARY_SEED_PL, LANGUAGE_NOTES_SEED_PL),
 ];
 export const SCHEMA_VERSION = MIGRATIONS.length;
 

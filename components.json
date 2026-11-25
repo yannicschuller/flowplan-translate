@@ -10,14 +10,16 @@
       "targets": [
         "fr",
         "zh",
-        "ru"
+        "ru",
+        "pl"
       ],
       "files": {
         "en": "locales/en.json",
         "de": "locales/reference/de.json",
         "fr": "locales/fr.json",
         "zh": "locales/zh.json",
-        "ru": "locales/ru.json"
+        "ru": "locales/ru.json",
+        "pl": "locales/pl.json"
       },
       "placeholders": [
         "index"

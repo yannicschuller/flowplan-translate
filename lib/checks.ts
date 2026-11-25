@@ -44,8 +44,27 @@ export function glossaryHits(source: string, glossary: GlossaryEntry[]) {
 // ("Espace de travail" → "Espaces de travail"). Russian words change their
 // ending by case and number ("База данных" → "Базу данных", "Записи",
 // "Рабочем пространстве"): a final vowel, й or ь is dropped and any ending
-// of up to four letters allowed.
-function wordPattern(word: string) {
+// of up to four letters allowed. Polish words (a Polish glossary entry) do
+// too ("Baza danych" → "Bazę danych", "Rekord" → "Rekordów", "Zadanie" →
+// "Zadań", "Skrzynka odbiorcza" → "Skrzynce odbiorczej", "Członek" →
+// "Członka"): a final vowel is dropped, the last consonant may soften
+// (k/c, t/c, n/ń, s/ś, c/ć, ł/l), an e before a final k may drop, and any
+// ending of up to four letters is allowed.
+const PL_SOFT: Record<string, string> = { k: "[kc]", t: "[tc]", n: "[nń]", ń: "[nń]", s: "[sś]", ś: "[sś]", c: "[cć]", ć: "[cć]", ł: "[łl]" };
+function polishWordPattern(word: string) {
+  const stem = word.replace(/[aeiouyąęó]{1,2}$/iu, "");
+  if (stem.length < 3) return escapeRegex(word) + "\\p{L}{0,4}";
+  const last = stem.slice(-1).toLowerCase();
+  let core = stem.slice(0, -1);
+  let fleeting = false;
+  if (last === "k" && /e$/iu.test(core) && core.length >= 3) {
+    core = core.slice(0, -1);
+    fleeting = true;
+  } else if (last === "k" && /[^aeiouyąęó]$/iu.test(core)) fleeting = true;
+  return escapeRegex(core) + (fleeting ? "e?" : "") + (PL_SOFT[last] ?? escapeRegex(stem.slice(-1))) + "\\p{L}{0,4}";
+}
+function wordPattern(word: string, lang: string) {
+  if (lang === "pl" && /^\p{L}{3,}$/u.test(word)) return polishWordPattern(word);
   if (/^\p{Script=Cyrillic}{3,}$/u.test(word)) {
     const stem = word.replace(/[аеёиоуыэюяйь]{1,2}$/iu, "");
     return escapeRegex(stem.length >= 3 ? stem : word) + "\\p{Script=Cyrillic}{0,4}";
@@ -53,12 +72,12 @@ function wordPattern(word: string) {
   return escapeRegex(word) + (/^\p{L}{3,}$/u.test(word) ? "[sx]?" : "");
 }
 // Is the glossary translation (or one of its " / " alternatives) used?
-function usesTranslation(text: string, translation: string) {
+function usesTranslation(text: string, translation: string, lang: string) {
   return translation
     .split(/\s+\/\s+/)
     .map((alt) => alt.trim())
     .filter(Boolean)
-    .some((alt) => new RegExp(alt.split(/\s+/).map(wordPattern).join("\\s+"), "iu").test(text));
+    .some((alt) => new RegExp(alt.split(/\s+/).map((word) => wordPattern(word, lang)).join("\\s+"), "iu").test(text));
 }
 
 export type CheckInput = {
@@ -116,7 +135,7 @@ export function checkTranslation(input: CheckInput): CheckResult {
   const have = finalPunctuation(text);
   if (want !== have) hints.push({ code: "punctuation_differs", values: [want, have] });
   for (const g of glossaryHits(source, input.glossary || []))
-    if (g.translation.trim() && !usesTranslation(text, g.translation)) hints.push({ code: "glossary_unused", values: [g.term, g.translation] });
+    if (g.translation.trim() && !usesTranslation(text, g.translation, g.lang)) hints.push({ code: "glossary_unused", values: [g.term, g.translation] });
   return { errors, hints };
 }
 

@@ -160,6 +160,33 @@ test("Russian: an accepted ru text is written to locales/ru.json, only there", a
   assert.match(repo.pulls.get(pr.number)!.body, /\| ru \| 2 \|/);
 });
 
+test("Polish: an accepted pl text is written to locales/pl.json, only there", async () => {
+  const reviewer = { ...signIn("yannicschuller").user, role: "reviewer" as const };
+  const repo = gh.repos.get(REPO)!;
+  // The previous test's pull request is merged first.
+  for (const pull of repo.pulls.values())
+    if (pull.state === "open") {
+      gh.commitFiles(REPO, "main", Object.fromEntries(repo.commits.get(repo.branches.get(pull.head)!)!.files), "merge");
+      Object.assign(pull, { state: "closed", merged: true });
+    }
+  await syncRepo(REPO);
+  await assert.rejects(createPullRequest(reviewer, REPO), (e: HttpError) => e.code === "nothing_to_export");
+  const before = gh.fileAt(REPO, "main", "locales/pl.json")!;
+  saveTranslation(reviewer, id("Database"), "pl", "Baza danych");
+  saveTranslation(reviewer, id(" · {0} records"), "pl", " · rekordy: {0}");
+  saveTranslation(reviewer, id("Workspace"), "pl", "Obszar roboczy – „źdźbło”");
+  const pr = await createPullRequest(reviewer, REPO);
+  assert.deepEqual(pr.files, ["locales/pl.json"]);
+  assert.deepEqual(pr.languages, { pl: 3 });
+  const written = gh.fileAt(REPO, repo.pulls.get(pr.number)!.head, "locales/pl.json")!;
+  assert.equal(JSON.parse(written).Database, "Baza danych");
+  assert.match(written, /"Workspace": "Obszar roboczy – „źdźbło”"/, "Polish letters and quotes as is, not escaped");
+  assert.equal(JSON.parse(written)[" · {0} records"], " · rekordy: {0}");
+  assert.equal(Object.keys(JSON.parse(written)).join(), Object.keys(JSON.parse(before)).join(), "same keys, same order");
+  assert.equal(written.split("\n").filter((line, i) => line !== before.split("\n")[i]).length, 3, "only the three changed lines");
+  assert.match(repo.pulls.get(pr.number)!.body, /\| pl \| 3 \|/);
+});
+
 test("a repository without the App's installation: a readable sync error, other repositories still sync", async () => {
   const desktop = await syncRepo("yannicschuller/flowplan-desktop");
   assert.deepEqual(desktop.errors.map((e) => [e.code, e.message]), [["app_not_installed", "The GitHub App is not installed on yannicschuller/flowplan-desktop."]]);

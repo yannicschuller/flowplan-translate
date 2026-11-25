@@ -87,6 +87,36 @@ test("Russian: saved where the component lists ru, refused elsewhere, unknown la
   assert.match(bad.headers.get("location")!, /error=invalid_lang/);
 });
 
+test("Polish: saved where the component lists pl, refused elsewhere", async () => {
+  const { cookie } = signIn("helper-pl");
+  const reviewer = signIn("yannicschuller");
+  const save = (json: Record<string, unknown>, c = cookie) => call(() => saveRoute(req("/api/translations", { method: "POST", json, cookie: c })));
+  const web = stringId(RECORDS);
+  const missing = await save({ stringId: web, lang: "pl", text: " · rekordy" });
+  assert.equal(missing.status, 422, "the placeholder check works for pl");
+  const suggested = await save({ stringId: web, lang: "pl", text: " · rekordy: {0}" });
+  assert.equal(suggested.status, 200);
+  assert.equal((await body(suggested)).outcome, "suggested");
+  assert.equal(entryDetail(web, "pl")!.suggestions[0].text, " · rekordy: {0}");
+  const accepted = await save({ stringId: web, lang: "pl", text: " · rekordy: {0}" }, reviewer.cookie);
+  assert.equal((await body(accepted)).outcome, "accepted");
+  assert.equal(entryDetail(web, "pl")!.current!.text, " · rekordy: {0}");
+  // flowplan-app-system translates fr and zh only.
+  const app = one<{ id: number }>("SELECT id FROM strings WHERE component_id='flowplan-app-system' LIMIT 1")!.id;
+  assert.equal(entryDetail(app, "pl"), null);
+  for (const c of [cookie, reviewer.cookie]) {
+    const refused = await save({ stringId: app, lang: "pl", text: "Tekst" }, c);
+    assert.equal(refused.status, 404);
+    assert.equal((await body(refused)).error, "not_found");
+  }
+  const confirm = await call(() => confirmRoute(req("/api/translations/confirm", { method: "POST", json: { stringId: app, lang: "pl" }, cookie })));
+  assert.equal(confirm.status, 404);
+  // The glossary takes Polish terms.
+  const term = await call(() => glossaryRoute(req("/api/glossary", { method: "POST", form: { lang: "pl", term: "Inbox", translation: "Skrzynka odbiorcza", note: "", next: "/glossary?lang=pl" }, cookie: reviewer.cookie })));
+  assert.equal(term.headers.get("location"), "/glossary?lang=pl&saved=1");
+  assert.equal(glossary("pl").find((g) => g.term === "Inbox")!.translation, "Skrzynka odbiorcza");
+});
+
 test("roles: a translator cannot accept, sync, export or edit the glossary; a reviewer can accept", async () => {
   const translator = signIn("helper3");
   const id = stringId(RECORDS);

@@ -5,7 +5,7 @@ import { PlaceholderText } from "@/components/placeholder-text";
 import type { PlaceholderStyle } from "@/lib/types";
 
 // The rules for translators, for every language here (French, Simplified
-// Chinese and Russian) and per language. Static text, no data.
+// Chinese, Russian and Polish) and per language. Static text, no data.
 export const dynamic = "force-dynamic";
 
 const DISCORD = "https://discord.gg/bCEdB6MPrR";
@@ -212,6 +212,38 @@ export default async function Guide() {
                 "Use the platforms' official terms (e.g. “Настройки” for Settings) and Flowplan's ",
               )}
               <Link href="/glossary?lang=ru">{t("Glossar", "glossary")}</Link>.
+            </li>
+          </ul>
+        </section>
+
+        <section className="card stack" aria-labelledby="g-pl">
+          <h2 id="g-pl">
+            <span lang="pl">Polski</span> <span className="muted">· {t("Polnisch", "Polish")}</span>
+          </h2>
+          <ul>
+            <li>
+              {t(
+                "Überall die Du-Form „ty“, wie im bisherigen Katalog (Pronomen großgeschrieben: „Twój“, „Tobie“), nie „Pan“/„Pani“; Aufforderungen ebenso: „Kliknij“, „Wybierz“.",
+                "Informal “ty” everywhere, as in the existing catalogue (pronouns capitalised: “Twój”, “Tobie”), never “Pan”/“Pani”; requests the same way: “Kliknij”, “Wybierz”.",
+              )}
+            </li>
+            <li>
+              {t(
+                "Anführungszeichen „ ”, kein Leerzeichen vor : ; ! ?. Polnisch hat mehrere Pluralformen, der Code aber keine Pluralregeln: Bei Zahlen wähle eine Form, die zu jeder Anzahl passt.",
+                "Quotes „ ”, no space before : ; ! ?. Polish has several plural forms but the code has no plural rules: with numbers, pick a form that fits any count.",
+              )}
+              <dl className="guide-example">
+                <Example label={t("Englisch", "English")} text=" · {0} records" lang="en" />
+                <Example label="✓" text=" · rekordy: {0}" lang="pl" />
+                <Example label="✗" text=" · {0} rekordów" lang="pl" bad />
+              </dl>
+            </li>
+            <li>
+              {t(
+                "Verwende die offiziellen Begriffe der Plattformen (z. B. „Ustawienia“ für Settings) und Flowplans ",
+                "Use the platforms' official terms (e.g. “Ustawienia” for Settings) and Flowplan's ",
+              )}
+              <Link href="/glossary?lang=pl">{t("Glossar", "glossary")}</Link>.
             </li>
           </ul>
         </section>

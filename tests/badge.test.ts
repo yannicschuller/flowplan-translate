@@ -111,6 +111,31 @@ test("Russian: only components that translate ru count, labelled Русский"
   );
 });
 
+test("Polish: only components that translate pl count, labelled Polski", async () => {
+  const web = coverage(["flowplan-web"], "pl");
+  assert.ok(web.total > 0);
+  const component = await (await get("component=flowplan-web&lang=pl&format=json")).json();
+  assert.deepEqual(component, { schemaVersion: 1, label: "Polski", message: `${percent(web.done, web.total)} %`, color: badgeColor(percent(web.done, web.total)) });
+  const svg = await get("repo=flowplan&lang=pl");
+  assert.equal(svg.status, 200);
+  assert.match(await svg.text(), /<title>Polski: \d+ % translated<\/title>/);
+  // Everything = the web app only; a repository without pl is unknown.
+  assert.equal((await (await get("lang=pl&format=json")).json()).message, component.message);
+  for (const q of ["repo=flowplan-app&lang=pl", "component=flowplan-app-system&lang=pl"]) {
+    const r = await get(`${q}&format=json`);
+    assert.equal(r.status, 404, q);
+    assert.equal((await r.json()).message, "unknown");
+  }
+  const reviewer = { ...signIn("yannicschuller").user, role: "reviewer" as const };
+  const id = one<{ id: number }>("SELECT id FROM strings WHERE component_id='flowplan-web' AND key='Workspace'")!.id;
+  saveTranslation(reviewer, id, "pl", "Obszar roboczy");
+  assert.equal(coverage(["flowplan-web"], "pl").done, web.done + 1);
+  assert.equal(
+    badgeMarkdown("https://translate.flowplan.org", "yannicschuller/flowplan", "pl", "flowplan-web"),
+    "[![Polski](https://translate.flowplan.org/api/badge?repo=flowplan&lang=pl)](https://translate.flowplan.org/c/flowplan-web/pl)",
+  );
+});
+
 test("escaping, label override and CJK width", async () => {
   const r = await get(`component=flowplan-web&lang=fr&label=${encodeURIComponent('<b>"Fr" & co</b>')}`);
   const body = await r.text();
