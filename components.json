@@ -11,7 +11,8 @@
         "fr",
         "zh",
         "ru",
-        "pl"
+        "pl",
+        "pt"
       ],
       "files": {
         "en": "locales/en.json",
@@ -19,7 +20,8 @@
         "fr": "locales/fr.json",
         "zh": "locales/zh.json",
         "ru": "locales/ru.json",
-        "pl": "locales/pl.json"
+        "pl": "locales/pl.json",
+        "pt": "locales/pt.json"
       },
       "placeholders": [
         "index"
@@ -34,13 +36,19 @@
       "reference": "de",
       "targets": [
         "fr",
-        "zh"
+        "zh",
+        "ru",
+        "pl",
+        "pt"
       ],
       "files": {
         "en": "locales/en.json",
         "de": "locales/de.json",
         "fr": "locales/fr.json",
-        "zh": "locales/zh.json"
+        "zh": "locales/zh.json",
+        "ru": "locales/ru.json",
+        "pl": "locales/pl.json",
+        "pt": "locales/pt.json"
       },
       "placeholders": [
         "printf",
@@ -56,13 +64,19 @@
       "reference": "de",
       "targets": [
         "fr",
-        "zh"
+        "zh",
+        "ru",
+        "pl",
+        "pt"
       ],
       "files": {
         "en": "locales/ui/en.json",
         "de": "locales/ui/de.json",
         "fr": "locales/ui/fr.json",
-        "zh": "locales/ui/zh.json"
+        "zh": "locales/ui/zh.json",
+        "ru": "locales/ui/ru.json",
+        "pl": "locales/ui/pl.json",
+        "pt": "locales/ui/pt.json"
       },
       "context": "locales/ui/context.json",
       "placeholders": [
@@ -80,13 +94,19 @@
       "reference": "de",
       "targets": [
         "fr",
-        "zh"
+        "zh",
+        "ru",
+        "pl",
+        "pt"
       ],
       "files": {
         "en": "plugins/capture/locales/en.json",
         "de": "plugins/capture/locales/de.json",
         "fr": "plugins/capture/locales/fr.json",
-        "zh": "plugins/capture/locales/zh.json"
+        "zh": "plugins/capture/locales/zh.json",
+        "ru": "plugins/capture/locales/ru.json",
+        "pl": "plugins/capture/locales/pl.json",
+        "pt": "plugins/capture/locales/pt.json"
       },
       "context": "plugins/capture/locales/context.json",
       "placeholders": [
@@ -104,13 +124,19 @@
       "reference": "de",
       "targets": [
         "fr",
-        "zh"
+        "zh",
+        "ru",
+        "pl",
+        "pt"
       ],
       "files": {
         "en": "plugins/intents/locales/en.json",
         "de": "plugins/intents/locales/de.json",
         "fr": "plugins/intents/locales/fr.json",
-        "zh": "plugins/intents/locales/zh.json"
+        "zh": "plugins/intents/locales/zh.json",
+        "ru": "plugins/intents/locales/ru.json",
+        "pl": "plugins/intents/locales/pl.json",
+        "pt": "plugins/intents/locales/pt.json"
       },
       "context": "plugins/intents/locales/context.json",
       "placeholders": [
@@ -128,13 +154,19 @@
       "reference": "de",
       "targets": [
         "fr",
-        "zh"
+        "zh",
+        "ru",
+        "pl",
+        "pt"
       ],
       "files": {
         "en": "plugins/widget-suite/locales/en.json",
         "de": "plugins/widget-suite/locales/de.json",
         "fr": "plugins/widget-suite/locales/fr.json",
-        "zh": "plugins/widget-suite/locales/zh.json"
+        "zh": "plugins/widget-suite/locales/zh.json",
+        "ru": "plugins/widget-suite/locales/ru.json",
+        "pl": "plugins/widget-suite/locales/pl.json",
+        "pt": "plugins/widget-suite/locales/pt.json"
       },
       "context": "plugins/widget-suite/locales/context.json",
       "placeholders": [
@@ -152,7 +184,10 @@
       "reference": "de",
       "targets": [
         "fr",
-        "zh"
+        "zh",
+        "ru",
+        "pl",
+        "pt"
       ],
       "files": [
         {
@@ -162,7 +197,10 @@
             "en": "en-US",
             "de": "de-DE",
             "fr": "fr-FR",
-            "zh": "zh-Hans"
+            "zh": "zh-Hans",
+            "ru": "ru",
+            "pl": "pl",
+            "pt": "pt-PT"
           },
           "fields": [
             "name",
@@ -179,7 +217,10 @@
             "en": "en-US",
             "de": "de-DE",
             "fr": "fr-FR",
-            "zh": "zh-CN"
+            "zh": "zh-CN",
+            "ru": "ru-RU",
+            "pl": "pl-PL",
+            "pt": "pt-PT"
           },
           "fields": [
             "title",
@@ -228,13 +269,19 @@
       "reference": "de",
       "targets": [
         "fr",
-        "zh"
+        "zh",
+        "ru",
+        "pl",
+        "pt"
       ],
       "files": {
         "en": "locales/en.json",
         "de": "locales/de.json",
         "fr": "locales/fr.json",
-        "zh": "locales/zh.json"
+        "zh": "locales/zh.json",
+        "ru": "locales/ru.json",
+        "pl": "locales/pl.json",
+        "pt": "locales/pt.json"
       },
       "context": "locales/context.json",
       "placeholders": [

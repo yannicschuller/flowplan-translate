@@ -1,0 +1,10 @@
+{
+  "server.empty": "Introduza o endereço da sua instância Flowplan.",
+  "server.httpsOnly": "Só são permitidos endereços HTTPS (HTTP apenas para localhost).",
+  "server.unreachable": "Não é possível aceder ao endereço ({0}). Verifique a ortografia e a sua ligação.",
+  "server.redirects": "O endereço redireciona para {0}. Introduza antes esse endereço.",
+  "server.proxyAuth": "O servidor pede-lhe que inicie sessão primeiro (HTTP {0}), por exemplo num proxy ou VPN à sua frente. Inicie sessão aí ou contacte o seu administrador.",
+  "server.status": "O servidor responde com um erro (HTTP {0}). O Flowplan não está disponível aí neste momento.",
+  "server.notFound": "Não foi encontrada nenhuma instância Flowplan em {0} ({1})",
+  "server.untrusted": "O certificado do servidor não é fidedigno ({0}). Instale a autoridade de certificação do seu servidor no arquivo de certificados do sistema ou confie no certificado ao adicionar o servidor."
+}

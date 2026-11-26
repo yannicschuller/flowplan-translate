@@ -2,7 +2,8 @@
 // existing catalogues (flowplan/locales/fr.json, zh.json) render them, with
 // the German term as a note. Reviewers maintain the glossary afterwards.
 // Russian came later (migration 4, RU_TERMS below), Polish after it
-// (migration 5, PL_TERMS below).
+// (migration 5, PL_TERMS below), European Portuguese last (migration 6,
+// PT_TERMS below).
 const TERMS: [term: string, de: string, fr: string, zh: string][] = [
   ["Workspace", "Arbeitsbereich", "Espace de travail", "工作区"],
   ["Database", "Datenbank", "Base de données", "数据库"],
@@ -101,6 +102,43 @@ export const LANGUAGE_NOTES_SEED_PL = [
     lang: "pl",
     note:
       "Informal address everywhere: „ty”, as the contributed catalogue does (Twój, Tobie – the pronouns capitalised as in Polish UIs), never the formal „Pan”/„Pani”; imperatives in the informal form (Kliknij, Wybierz). Polish quotes „…”, no space before : ; ! ?. Polish has several plural forms but there are no plural rules in the code: with a number, prefer forms that fit any count (e.g. „Rekordy: {0}”).",
+  },
+];
+
+// European Portuguese (migration 6): the core terms as the contributed
+// catalogue (flowplan/locales/pt.json, flowplan#566) renders them – pt-PT
+// after the 1990 spelling agreement (Registo, Aspeto), "Base de dados",
+// "Vista", "Painel"; Marketplace kept as the name.
+const PT_TERMS: Record<string, string> = {
+  Workspace: "Espaço de trabalho",
+  Database: "Base de dados",
+  Whiteboard: "Quadro branco",
+  Journal: "Diário",
+  Page: "Página",
+  Block: "Bloco",
+  Template: "Modelo",
+  Record: "Registo",
+  Space: "Espaço",
+  Workflow: "Fluxo de trabalho",
+  Task: "Tarefa",
+  Inbox: "Caixa de entrada",
+  Dashboard: "Painel",
+  View: "Vista",
+  Property: "Propriedade",
+  Look: "Aspeto",
+  Marketplace: "Marketplace",
+  Member: "Membro",
+  Calendar: "Calendário",
+  Tag: "Etiqueta",
+};
+
+export const GLOSSARY_SEED_PT = TERMS.map(([term, de]) => ({ lang: "pt", term, translation: PT_TERMS[term], note: `Deutsch: ${de}` }));
+
+export const LANGUAGE_NOTES_SEED_PT = [
+  {
+    lang: "pt",
+    note:
+      "European Portuguese (pt-PT, spelling after the 1990 agreement: ação, ativo, registo, aspeto), not Brazilian: definições (not configurações), ecrã (not tela), ficheiro (not arquivo), ligação (not link/conexão), utilizador (not usuário), guardar (not salvar). Polite address without “você”: the verb in the third person and “o seu/a sua” (Guarde as suas alterações), never “tu”. Platform terms as Apple and Google write them for Portugal (ecrã principal, Definições rápidas, Atividades em direto). Quotes “…” as in the catalogue. There are no plural rules in the code: with a number, prefer forms that fit any count (e.g. “Registos: {0}”).",
   },
 ];
 

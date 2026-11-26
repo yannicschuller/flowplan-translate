@@ -1,0 +1,12 @@
+{
+  "heading": "Guardar no Flowplan",
+  "cancel": "Cancelar",
+  "save": "Guardar",
+  "close": "Fechar",
+  "titleField": "Título (opcional)",
+  "textField": "Texto (opcional)",
+  "saved": "Guardado em {target}",
+  "failed": "Não guardado: {error}",
+  "tooMany": "No máximo {count} ficheiros de cada vez.",
+  "tooLarge": "{name} tem mais de {mb} MB."
+}

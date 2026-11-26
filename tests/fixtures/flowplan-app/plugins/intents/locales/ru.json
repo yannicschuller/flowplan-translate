@@ -1,0 +1,12 @@
+{
+  "Add a task": "Добавить задачу",
+  "Adds a task to a list or database in Flowplan.": "Добавляет задачу в список или базу данных в Flowplan.",
+  "What's the task?": "Какая задача?",
+  "Due": "Срок",
+  "List": "Список",
+  "Added to %@": "Добавлено в %@",
+  "Added to %@, due %@": "Добавлено в %@, срок %@",
+  "%d due today": "Срок сегодня: %d",
+  "%d overdue": "Просрочено: %d",
+  "%@: %@": "%@: %@"
+}

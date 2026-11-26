@@ -1,0 +1,12 @@
+{
+  "heading": "Сохранить в Flowplan",
+  "cancel": "Отмена",
+  "save": "Сохранить",
+  "close": "Закрыть",
+  "titleField": "Заголовок (необязательно)",
+  "textField": "Текст (необязательно)",
+  "saved": "Сохранено в {target}",
+  "failed": "Не сохранено: {error}",
+  "tooMany": "Не более {count} файлов за раз.",
+  "tooLarge": "{name} больше {mb} МБ."
+}

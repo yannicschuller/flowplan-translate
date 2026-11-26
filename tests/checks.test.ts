@@ -144,6 +144,20 @@ test("checks: Polish – placeholders, case, glossary terms in any case and numb
   assert.deepEqual(codes(pl("Saved.", "Zapisano"), "hints"), ["punctuation_differs"]);
 });
 
+test("checks: Portuguese – placeholders, glossary terms in the plural", () => {
+  const glossary = [
+    { id: 1, lang: "pt", term: "Workspace", translation: "Espaço de trabalho", note: "" },
+    { id: 2, lang: "pt", term: "Database", translation: "Base de dados", note: "" },
+    { id: 3, lang: "pt", term: "Record", translation: "Registo", note: "" },
+  ];
+  const pt = (source: string, text: string) => check({ source, text, glossary });
+  assert.deepEqual(pt(" · {0} records", " · registos: {0}").hints, []);
+  assert.deepEqual(codes(pt(" · {0} records", " · registos"), "errors"), ["placeholders_missing"]);
+  assert.deepEqual(pt("All workspaces", "Todos os espaços de trabalho").hints, [], "plural");
+  assert.deepEqual(pt("Two databases", "Duas bases de dados").hints, [], "plural");
+  assert.deepEqual(codes(pt("Open a record", "Abrir uma entrada"), "hints"), ["glossary_unused"]);
+});
+
 test("placeholders: index style {0} only – a literal {Content} is text", () => {
   assert.deepEqual(placeholders("{0} in {Content}", ["index"]), ["{0}"]);
   assert.deepEqual(comparePlaceholders("{Content}", "{Contenu}", ["index"]), { missing: [], extra: [] });

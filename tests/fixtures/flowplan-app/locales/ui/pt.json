@@ -1,0 +1,16 @@
+{
+  "setupTitle": "Bem-vindo ao Flowplan",
+  "setupText": "Ligue-se a app.flowplan.org ou introduza o endereço da sua própria instância Flowplan.",
+  "setupHint": "Pode adicionar mais instâncias mais tarde nas definições da app, em “Perfis”. Mude de perfil aí ou mantendo premido o ícone da app: “Mudar de perfil”.",
+  "label": "Endereço da instância",
+  "placeholder": "https://flowplan.a-sua-empresa.pt",
+  "connect": "Ligar",
+  "connecting": "A ligar …",
+  "unreachable": "Nada responde em {server}. Verifique o endereço e a sua ligação à internet.",
+  "redirect": "{server} redireciona para {detail}. Introduza esse endereço.",
+  "notFlowplan": "Não há nenhum Flowplan a funcionar em {server}.",
+  "connectingTo": "A ligar a {server} …",
+  "offlineServer": "{server} não está a responder neste momento.",
+  "offlineCopyAt": "Cópia offline neste dispositivo, atualizada {age}",
+  "tooManyProfiles": "No máximo {count} perfis."
+}

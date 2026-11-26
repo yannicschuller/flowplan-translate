@@ -1,0 +1,10 @@
+{
+  "server.empty": "Wpisz adres swojej instancji Flowplan.",
+  "server.httpsOnly": "Dozwolone są tylko adresy HTTPS (HTTP tylko dla localhost).",
+  "server.unreachable": "Adres jest nieosiągalny ({0}). Sprawdź pisownię i połączenie.",
+  "server.redirects": "Adres przekierowuje do {0}. Wpisz zamiast niego ten adres.",
+  "server.proxyAuth": "Serwer prosi najpierw o zalogowanie (HTTP {0}), np. w proxy lub VPN przed nim. Zaloguj się tam lub zapytaj administratora.",
+  "server.status": "Serwer odpowiada błędem (HTTP {0}). Flowplan jest tam obecnie niedostępny.",
+  "server.notFound": "Nie znaleziono instancji Flowplan pod adresem {0} ({1})",
+  "server.untrusted": "Certyfikat serwera nie jest zaufany ({0}). Zainstaluj urząd certyfikacji swojego serwera w magazynie certyfikatów systemu albo zaufaj certyfikatowi przy dodawaniu serwera."
+}

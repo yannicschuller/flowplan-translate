@@ -14,6 +14,7 @@ import { userForSessionToken } from "../lib/auth";
 useTempData();
 importFixture("flowplan-web", "flowplan");
 importFixture("flowplan-app-system", "flowplan-app");
+importFixture("flowplan-website", "flowplan-website");
 const stringId = (key: string) => one<{ id: number }>("SELECT id FROM strings WHERE component_id='flowplan-web' AND key=?", key)!.id;
 const call = (fn: () => Promise<Response> | Response) => handle(fn);
 const body = async (r: Response) => (await r.json()) as Record<string, unknown>;
@@ -68,8 +69,10 @@ test("Russian: saved where the component lists ru, refused elsewhere, unknown la
   const accepted = await save({ stringId: web, lang: "ru", text: " · записей: {0}" }, reviewer.cookie);
   assert.equal((await body(accepted)).outcome, "accepted");
   assert.equal(entryDetail(web, "ru")!.current!.text, " · записей: {0}");
-  // flowplan-app-system translates fr and zh only.
-  const app = one<{ id: number }>("SELECT id FROM strings WHERE component_id='flowplan-app-system' LIMIT 1")!.id;
+  // The app translates ru too; the website only fr and zh.
+  const appText = one<{ id: number }>("SELECT id FROM strings WHERE component_id='flowplan-app-system' LIMIT 1")!.id;
+  assert.ok(entryDetail(appText, "ru"));
+  const app = one<{ id: number }>("SELECT id FROM strings WHERE component_id='flowplan-website' LIMIT 1")!.id;
   assert.equal(entryDetail(app, "ru"), null);
   for (const c of [cookie, reviewer.cookie]) {
     const refused = await save({ stringId: app, lang: "ru", text: "Текст" }, c);
@@ -101,8 +104,10 @@ test("Polish: saved where the component lists pl, refused elsewhere", async () =
   const accepted = await save({ stringId: web, lang: "pl", text: " · rekordy: {0}" }, reviewer.cookie);
   assert.equal((await body(accepted)).outcome, "accepted");
   assert.equal(entryDetail(web, "pl")!.current!.text, " · rekordy: {0}");
-  // flowplan-app-system translates fr and zh only.
-  const app = one<{ id: number }>("SELECT id FROM strings WHERE component_id='flowplan-app-system' LIMIT 1")!.id;
+  // The app translates pl too; the website only fr and zh.
+  const appText = one<{ id: number }>("SELECT id FROM strings WHERE component_id='flowplan-app-system' LIMIT 1")!.id;
+  assert.ok(entryDetail(appText, "pl"));
+  const app = one<{ id: number }>("SELECT id FROM strings WHERE component_id='flowplan-website' LIMIT 1")!.id;
   assert.equal(entryDetail(app, "pl"), null);
   for (const c of [cookie, reviewer.cookie]) {
     const refused = await save({ stringId: app, lang: "pl", text: "Tekst" }, c);
@@ -115,6 +120,33 @@ test("Polish: saved where the component lists pl, refused elsewhere", async () =
   const term = await call(() => glossaryRoute(req("/api/glossary", { method: "POST", form: { lang: "pl", term: "Inbox", translation: "Skrzynka odbiorcza", note: "", next: "/glossary?lang=pl" }, cookie: reviewer.cookie })));
   assert.equal(term.headers.get("location"), "/glossary?lang=pl&saved=1");
   assert.equal(glossary("pl").find((g) => g.term === "Inbox")!.translation, "Skrzynka odbiorcza");
+});
+
+test("Portuguese: saved for the web app and the app, refused for the website", async () => {
+  const { cookie } = signIn("helper-pt");
+  const reviewer = signIn("yannicschuller");
+  const save = (json: Record<string, unknown>, c = cookie) => call(() => saveRoute(req("/api/translations", { method: "POST", json, cookie: c })));
+  const web = stringId(RECORDS);
+  const missing = await save({ stringId: web, lang: "pt", text: " · registos" });
+  assert.equal(missing.status, 422, "the placeholder check works for pt");
+  const suggested = await save({ stringId: web, lang: "pt", text: " · registos: {0}" });
+  assert.equal(suggested.status, 200);
+  assert.equal((await body(suggested)).outcome, "suggested");
+  const accepted = await save({ stringId: web, lang: "pt", text: " · registos: {0}" }, reviewer.cookie);
+  assert.equal((await body(accepted)).outcome, "accepted");
+  assert.equal(entryDetail(web, "pt")!.current!.text, " · registos: {0}");
+  // The app's system texts list pt: the repository's text counts as accepted.
+  const appText = one<{ id: number }>("SELECT id FROM strings WHERE component_id='flowplan-app-system' AND key='android.share_label'")!.id;
+  assert.equal(entryDetail(appText, "pt")!.current!.text, "Guardar no Flowplan");
+  // The website does not.
+  const site = one<{ id: number }>("SELECT id FROM strings WHERE component_id='flowplan-website' LIMIT 1")!.id;
+  assert.equal(entryDetail(site, "pt"), null);
+  const refused = await save({ stringId: site, lang: "pt", text: "Texto" }, reviewer.cookie);
+  assert.equal(refused.status, 404);
+  // The glossary takes Portuguese terms.
+  const term = await call(() => glossaryRoute(req("/api/glossary", { method: "POST", form: { lang: "pt", term: "Inbox", translation: "Caixa de entrada", note: "", next: "/glossary?lang=pt" }, cookie: reviewer.cookie })));
+  assert.equal(term.headers.get("location"), "/glossary?lang=pt&saved=1");
+  assert.equal(glossary("pt").find((g) => g.term === "Inbox")!.translation, "Caixa de entrada");
 });
 
 test("roles: a translator cannot accept, sync, export or edit the glossary; a reviewer can accept", async () => {

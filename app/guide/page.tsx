@@ -5,7 +5,8 @@ import { PlaceholderText } from "@/components/placeholder-text";
 import type { PlaceholderStyle } from "@/lib/types";
 
 // The rules for translators, for every language here (French, Simplified
-// Chinese, Russian and Polish) and per language. Static text, no data.
+// Chinese, Russian, Polish and European Portuguese) and per language. Static
+// text, no data.
 export const dynamic = "force-dynamic";
 
 const DISCORD = "https://discord.gg/bCEdB6MPrR";
@@ -244,6 +245,44 @@ export default async function Guide() {
                 "Use the platforms' official terms (e.g. “Ustawienia” for Settings) and Flowplan's ",
               )}
               <Link href="/glossary?lang=pl">{t("Glossar", "glossary")}</Link>.
+            </li>
+          </ul>
+        </section>
+
+        <section className="card stack" aria-labelledby="g-pt">
+          <h2 id="g-pt">
+            <span lang="pt-PT">Português</span> <span className="muted">· {t("Portugiesisch (Portugal)", "Portuguese (Portugal)")}</span>
+          </h2>
+          <ul>
+            <li>
+              {t(
+                "Europäisches Portugiesisch (pt-PT) nach der Rechtschreibreform von 1990 („ação“, „registo“, „aspeto“), nicht brasilianisch: „definições“, „ecrã“, „ficheiro“, „ligação“, „utilizador“, „guardar“ – nicht „configurações“, „tela“, „arquivo“, „usuário“, „salvar“.",
+                "European Portuguese (pt-PT) after the 1990 spelling agreement (“ação”, “registo”, “aspeto”), not Brazilian: “definições”, “ecrã”, “ficheiro”, “ligação”, “utilizador”, “guardar” – not “configurações”, “tela”, “arquivo”, “usuário”, “salvar”.",
+              )}
+            </li>
+            <li>
+              {t(
+                "Höflich ohne „você“, wie im bisherigen Katalog: das Verb in der dritten Person und „o seu/a sua“ („Guarde as suas alterações“), nie „tu“.",
+                "Polite without “você”, as in the existing catalogue: the verb in the third person and “o seu/a sua” (“Guarde as suas alterações”), never “tu”.",
+              )}
+            </li>
+            <li>
+              {t(
+                "Anführungszeichen “ ” wie im Katalog. Der Code hat keine Pluralregeln: Bei Zahlen wähle eine Form, die auch zu 1 passt.",
+                "Quotes “ ” as in the catalogue. The code has no plural rules: with numbers, pick a form that also fits 1.",
+              )}
+              <dl className="guide-example">
+                <Example label={t("Englisch", "English")} text=" · {0} records" lang="en" />
+                <Example label="✓" text=" · registos: {0}" lang="pt-PT" />
+                <Example label="✗" text=" · {0} registos" lang="pt-PT" bad />
+              </dl>
+            </li>
+            <li>
+              {t(
+                "Verwende die offiziellen Begriffe der Plattformen für Portugal (z. B. „Definições“ für Settings, „ecrã principal“ für Home Screen) und Flowplans ",
+                "Use the platforms' official terms for Portugal (e.g. “Definições” for Settings, “ecrã principal” for Home Screen) and Flowplan's ",
+              )}
+              <Link href="/glossary?lang=pt">{t("Glossar", "glossary")}</Link>.
             </li>
           </ul>
         </section>

@@ -1,0 +1,16 @@
+{
+  "setupTitle": "Добро пожаловать в Flowplan",
+  "setupText": "Подключитесь к app.flowplan.org или введите адрес собственного экземпляра Flowplan.",
+  "setupHint": "Другие экземпляры можно добавить позже в настройках приложения в разделе «Профили». Переключаться можно там или долгим нажатием на значок приложения: «Сменить профиль».",
+  "label": "Адрес экземпляра",
+  "placeholder": "https://flowplan.vasha-kompaniya.ru",
+  "connect": "Подключиться",
+  "connecting": "Подключение …",
+  "unreachable": "По адресу {server} никто не отвечает. Проверьте адрес и подключение к интернету.",
+  "redirect": "{server} перенаправляет на {detail}. Введите этот адрес.",
+  "notFlowplan": "По адресу {server} не работает Flowplan.",
+  "connectingTo": "Подключение к {server} …",
+  "offlineServer": "{server} сейчас не отвечает.",
+  "offlineCopyAt": "Офлайн-копия на этом устройстве, обновлена {age}",
+  "tooManyProfiles": "Не более {count} профилей."
+}

@@ -10,10 +10,11 @@ Interface in German and English. The source language is English, German is shown
 | --- | --- | --- | --- |
 | `fr` | French | Français | every component |
 | `zh` | Simplified Chinese | 简体中文 | every component |
-| `ru` | Russian | Русский | the web app (`flowplan-web`, `locales/ru.json` in yannicschuller/flowplan) only, for now |
-| `pl` | Polish | Polski | the web app (`flowplan-web`, `locales/pl.json` in yannicschuller/flowplan) only, for now |
+| `ru` | Russian | Русский | the web app, the mobile app (every `flowplan-app-*` component, App Store `ru`, Google Play `ru-RU`) and the desktop app – not the website, for now |
+| `pl` | Polish | Polski | the web app, the mobile app (App Store `pl`, Google Play `pl-PL`) and the desktop app – not the website, for now |
+| `pt` | European Portuguese | Português | the web app (`locales/pt.json`, contributed in flowplan#566), the mobile app (App Store and Google Play `pt-PT`) and the desktop app – not the website, for now |
 
-The languages the tool knows are `TARGET_LANGS` in [`lib/types.ts`](lib/types.ts) (with their names in `LANG_NAMES`); which of them a component offers is its `targets` list in `components.json`. A language a component does not list has no list or editor there (404), saving it is refused (404), and it does not count in that component's badges. To offer Russian or Polish for another component, add `"ru"` or `"pl"` to its `targets` and its file (or, for `txt-files`, its locale folder per group) – once the repository has that file with every key. While a listed target file is missing on main, every sync reports `file not found: …` for that component (to reviewers on the overview) and the other languages sync as usual.
+The languages the tool knows are `TARGET_LANGS` in [`lib/types.ts`](lib/types.ts) (with their names in `LANG_NAMES`); which of them a component offers is its `targets` list in `components.json`. A language a component does not list has no list or editor there (404), saving it is refused (404), and it does not count in that component's badges. To offer Russian, Polish or Portuguese for another component (today: the website's two), add `"ru"`, `"pl"` or `"pt"` to its `targets` and its file (or, for `txt-files`, its locale folder per group) – once the repository has that file with every key. While a listed target file is missing on main, every sync reports `file not found: …` for that component (to reviewers on the overview) and the other languages sync as usual.
 
 ## How it works
 
@@ -26,7 +27,7 @@ The languages the tool knows are `TARGET_LANGS` in [`lib/types.ts`](lib/types.ts
 | `id`, `title` | Identifier (URL) and display name. |
 | `repo`, `branch` | GitHub repository (`owner/name`) and its main branch (default `main`). |
 | `format` | `flat-json`, `nested-json` or `txt-files` (see below). |
-| `source`, `reference`, `targets` | Source language (`en`), German reference (`de`, optional file), target languages (any of `fr`, `zh`, `ru`, `pl`, each once). |
+| `source`, `reference`, `targets` | Source language (`en`), German reference (`de`, optional file), target languages (any of `fr`, `zh`, `ru`, `pl`, `pt`, each once). |
 | `files` | JSON formats: language → file path. `txt-files`: groups of `{ key, path, locales, fields }`, where `{field}` and `{locale}` are filled in (e.g. `zh` → `zh-Hans` in the App Store, `zh-CN` on Google Play). |
 | `context` | Optional `{ "key": "comment" }` file with notes for translators. |
 | `placeholders` | Placeholder styles to check: `index` (`{0}`), `brace` (`{0}`, `{name}`), `printf` (`%@ %d %s %1$s %2$@`), `dollar` (`${applicationName}`). |
@@ -62,7 +63,7 @@ Translations are always shown as text, never as HTML.
 
 ### Guidelines
 
-`/guide` (linked in the header, the footer and on the overview) holds the rules for translators: English is the source of truth for meaning, casing, punctuation, edge spaces and symbols; German is a reference for the meaning only. Plus placeholders, names and keys, length, and the rules for French ("vous", French typography, platform terms), Simplified Chinese (full-width punctuation, spacing, platform terms), Russian (formal "вы", « » quotes, number forms that fit any count since the code has no plural rules, platform terms) and Polish (informal "ty" as the contributed catalogue uses it, „ ” quotes, number forms that fit any count, platform terms). The editor repeats the first rule under the reference and, when the source is a fragment (lowercase start, a mark or space at the start or end – `lib/fragment.ts`), says what to keep.
+`/guide` (linked in the header, the footer and on the overview) holds the rules for translators: English is the source of truth for meaning, casing, punctuation, edge spaces and symbols; German is a reference for the meaning only. Plus placeholders, names and keys, length, and the rules for French ("vous", French typography, platform terms), Simplified Chinese (full-width punctuation, spacing, platform terms), Russian (formal "вы", « » quotes, number forms that fit any count since the code has no plural rules, platform terms), Polish (informal "ty" as the contributed catalogue uses it, „ ” quotes, number forms that fit any count, platform terms) and European Portuguese (pt-PT spelling after the 1990 agreement and its own words – definições, ecrã, ficheiro, ligação –, polite address with "o seu/a sua" and never "tu", forms that also fit 1, platform terms for Portugal). The editor repeats the first rule under the reference and, when the source is a fragment (lowercase start, a mark or space at the start or end – `lib/fragment.ts`), says what to keep.
 
 ### Originals
 
@@ -89,7 +90,7 @@ The overview shows "open pull request #n" only while GitHub says so. The state o
 
 ### Glossary
 
-Per language: term → translation, with a note, plus one note per language (French: "vous" everywhere; Russian: formal "вы", never "ты"; Polish: informal "ty", as the contributed catalogue uses it). Seeded on the first start with Flowplan's core terms as the existing catalogues render them (Workspace → Espace de travail / 工作区, Database → Base de données / 数据库, Journal → Journal / 日记, …); Russian is seeded by migration 4 with the usual Russian UI terms (Workspace → Рабочее пространство, Database → База данных, Journal → Дневник, Page → Страница, Space → Раздел, Record → Запись, …); Polish by migration 5 with the terms of the contributed catalogue, or the usual Polish UI term where it has a verb or a stray rendering (Workspace → Obszar roboczy, Database → Baza danych, Journal → Dziennik, Page → Strona, Space → Przestrzeń, Record → Rekord, View → Widok, Look → Wygląd, …). Seeding never overwrites a term a reviewer already added. The editor shows the terms found in a text.
+Per language: term → translation, with a note, plus one note per language (French: "vous" everywhere; Russian: formal "вы", never "ты"; Polish: informal "ty", as the contributed catalogue uses it; Portuguese: pt-PT, "o seu/a sua", never "tu"). Seeded on the first start with Flowplan's core terms as the existing catalogues render them (Workspace → Espace de travail / 工作区, Database → Base de données / 数据库, Journal → Journal / 日记, …); Russian is seeded by migration 4 with the usual Russian UI terms (Workspace → Рабочее пространство, Database → База данных, Journal → Дневник, Page → Страница, Space → Раздел, Record → Запись, …); Polish by migration 5 with the terms of the contributed catalogue, or the usual Polish UI term where it has a verb or a stray rendering (Workspace → Obszar roboczy, Database → Baza danych, Journal → Dziennik, Page → Strona, Space → Przestrzeń, Record → Rekord, View → Widok, Look → Wygląd, …); European Portuguese by migration 6 with the terms of the contributed catalogue (Workspace → Espaço de trabalho, Database → Base de dados, Record → Registo, View → Vista, Look → Aspeto, Dashboard → Painel, …). Seeding never overwrites a term a reviewer already added. The editor shows the terms found in a text.
 
 ### Badges
 
@@ -101,9 +102,9 @@ Coverage badges for READMEs, rendered as SVG by the tool itself (no external ser
 | `<TRANSLATE_URL>/api/badge?component=flowplan-web&lang=zh` | one component |
 | `<TRANSLATE_URL>/api/badge?lang=fr` | everything |
 
-- `lang` is required (`fr`, `zh`, `ru` or `pl`); without it the answer is 400. An unknown language, repository or component gives a grey "unknown" badge with status 404 – so does a language none of the chosen components translates (e.g. `repo=flowplan-app&lang=ru` or `lang=pl`). Only components that list the language count.
+- `lang` is required (`fr`, `zh`, `ru`, `pl` or `pt`); without it the answer is 400. An unknown language, repository or component gives a grey "unknown" badge with status 404 – so does a language none of the chosen components translates (e.g. `repo=flowplan-website&lang=ru`). Only components that list the language count.
 - Coverage = current translations that are not outdated ÷ texts (not removed), as on the overview, from the state of the last sync. The message is the floored percentage ("97 %"), coloured like flowplan's README table: 100 % `#2ea44f`, from 90 % `#a3c51c`, from 50 % `#dfb317`, below `#e05d44`.
-- The label is the language's own name (Français, 简体中文, Русский, Polski); `&label=…` replaces it.
+- The label is the language's own name (Français, 简体中文, Русский, Polski, Português); `&label=…` replaces it.
 - `&format=json` returns the [shields.io endpoint](https://shields.io/badges/endpoint-badge) format `{"schemaVersion":1,"label":…,"message":…,"color":…}` with `Access-Control-Allow-Origin: *`.
 - Cached for 10 minutes (`Cache-Control: public, max-age=600`). The endpoint never reads or sets cookies.
 

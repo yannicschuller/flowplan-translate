@@ -1,0 +1,12 @@
+{
+  "heading": "Zapisz w Flowplan",
+  "cancel": "Anuluj",
+  "save": "Zapisz",
+  "close": "Zamknij",
+  "titleField": "Tytuł (opcjonalnie)",
+  "textField": "Tekst (opcjonalnie)",
+  "saved": "Zapisano w {target}",
+  "failed": "Nie zapisano: {error}",
+  "tooMany": "Maksymalnie {count} plików naraz.",
+  "tooLarge": "{name} ma więcej niż {mb} MB."
+}

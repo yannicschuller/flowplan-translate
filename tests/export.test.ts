@@ -187,6 +187,29 @@ test("Polish: an accepted pl text is written to locales/pl.json, only there", as
   assert.match(repo.pulls.get(pr.number)!.body, /\| pl \| 3 \|/);
 });
 
+test("Portuguese: an accepted pt text is written to locales/pt.json, only there", async () => {
+  const reviewer = { ...signIn("yannicschuller").user, role: "reviewer" as const };
+  const repo = gh.repos.get(REPO)!;
+  for (const pull of repo.pulls.values())
+    if (pull.state === "open") {
+      gh.commitFiles(REPO, "main", Object.fromEntries(repo.commits.get(repo.branches.get(pull.head)!)!.files), "merge");
+      Object.assign(pull, { state: "closed", merged: true });
+    }
+  await syncRepo(REPO);
+  await assert.rejects(createPullRequest(reviewer, REPO), (e: HttpError) => e.code === "nothing_to_export");
+  const before = gh.fileAt(REPO, "main", "locales/pt.json")!;
+  saveTranslation(reviewer, id("Database"), "pt", "Base de dados");
+  saveTranslation(reviewer, id(" · {0} records"), "pt", " · registos: {0}");
+  const pr = await createPullRequest(reviewer, REPO);
+  assert.deepEqual(pr.files, ["locales/pt.json"]);
+  assert.deepEqual(pr.languages, { pt: 2 });
+  const written = gh.fileAt(REPO, repo.pulls.get(pr.number)!.head, "locales/pt.json")!;
+  assert.equal(JSON.parse(written).Database, "Base de dados");
+  assert.equal(Object.keys(JSON.parse(written)).join(), Object.keys(JSON.parse(before)).join(), "same keys, same order");
+  assert.equal(written.split("\n").filter((line, i) => line !== before.split("\n")[i]).length, 2, "only the two changed lines");
+  assert.match(repo.pulls.get(pr.number)!.body, /\| pt \| 2 \|/);
+});
+
 test("a repository without the App's installation: a readable sync error, other repositories still sync", async () => {
   const desktop = await syncRepo("yannicschuller/flowplan-desktop");
   assert.deepEqual(desktop.errors.map((e) => [e.code, e.message]), [["app_not_installed", "The GitHub App is not installed on yannicschuller/flowplan-desktop."]]);
